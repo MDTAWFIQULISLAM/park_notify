@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:park_notify/core/app_export.dart';
 
+
 class AppNavigationScreen extends StatelessWidget {
   const AppNavigationScreen({Key? key})
       : super(
-          key: key,
-        );
+    key: key,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,12 @@ class AppNavigationScreen extends StatelessWidget {
                         ),
                         _buildScreenTitle(
                           context,
+                          screenTitle: "Map page  refined (Tanvir)",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.mapPageRefinedTanvirScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
                           screenTitle: "Create Account",
                           onTapScreenTitle: () => onTapScreenTitle(
                               context, AppRoutes.createAccountScreen),
@@ -54,6 +61,42 @@ class AppNavigationScreen extends StatelessWidget {
                           screenTitle: "Register Your Vehicle ",
                           onTapScreenTitle: () => onTapScreenTitle(
                               context, AppRoutes.registerYourVehicleScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Refined Final",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.refinedFinalScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Enter Destination (Maimuna)",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.enterDestinationMaimunaScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Choose parking One",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.chooseParkingOneScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Choose parking Two",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.chooseParkingTwoScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Choose parking Four",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.chooseParkingFourScreen),
+                        ),
+                        _buildScreenTitle(
+                          context,
+                          screenTitle: "Confirmation",
+                          onTapScreenTitle: () => onTapScreenTitle(
+                              context, AppRoutes.confirmationScreen),
                         ),
                       ],
                     ),
@@ -122,10 +165,10 @@ class AppNavigationScreen extends StatelessWidget {
 
   /// Common widget
   Widget _buildScreenTitle(
-    BuildContext context, {
-    required String screenTitle,
-    Function? onTapScreenTitle,
-  }) {
+      BuildContext context, {
+        required String screenTitle,
+        Function? onTapScreenTitle,
+      }) {
     return GestureDetector(
       onTap: () {
         onTapScreenTitle!.call();
@@ -168,9 +211,9 @@ class AppNavigationScreen extends StatelessWidget {
 
   /// Common click event
   void onTapScreenTitle(
-    BuildContext context,
-    String routeName,
-  ) {
+      BuildContext context,
+      String routeName,
+      ) {
     Navigator.pushNamed(context, routeName);
   }
 }

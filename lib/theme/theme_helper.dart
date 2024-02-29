@@ -51,7 +51,7 @@ class ThemeHelper {
       scaffoldBackgroundColor: appTheme.whiteA700,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primaryContainer,
+          backgroundColor: colorScheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.h),
           ),
@@ -66,7 +66,7 @@ class ThemeHelper {
         style: OutlinedButton.styleFrom(
           backgroundColor: Colors.transparent,
           side: BorderSide(
-            color: colorScheme.primary,
+            color: appTheme.blueGray100,
             width: 1.h,
           ),
           shape: RoundedRectangleBorder(
@@ -97,7 +97,7 @@ class ThemeHelper {
       dividerTheme: DividerThemeData(
         thickness: 1,
         space: 1,
-        color: colorScheme.onError,
+        color: colorScheme.onErrorContainer.withOpacity(1),
       ),
     );
   }
@@ -112,61 +112,72 @@ class ThemeHelper {
 /// Class containing the supported text theme styles.
 class TextThemes {
   static TextTheme textTheme(ColorScheme colorScheme) => TextTheme(
-        bodyMedium: TextStyle(
-          color: colorScheme.onError,
-          fontSize: 14.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w400,
-        ),
-        headlineLarge: TextStyle(
-          color: appTheme.whiteA700,
-          fontSize: 32.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w400,
-        ),
-        headlineSmall: TextStyle(
-          color: colorScheme.onError,
-          fontSize: 25.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w700,
-        ),
-        titleLarge: TextStyle(
-          color: appTheme.whiteA700,
-          fontSize: 20.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w700,
-        ),
-        titleMedium: TextStyle(
-          color: appTheme.whiteA700,
-          fontSize: 17.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w700,
-        ),
-        titleSmall: TextStyle(
-          color: colorScheme.errorContainer,
-          fontSize: 14.fSize,
-          fontFamily: 'Oxygen',
-          fontWeight: FontWeight.w700,
-        ),
-      );
+    bodyLarge: TextStyle(
+      color: colorScheme.onErrorContainer.withOpacity(1),
+      fontSize: 16.fSize,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w300,
+    ),
+    bodyMedium: TextStyle(
+      color: colorScheme.onErrorContainer.withOpacity(1),
+      fontSize: 14.fSize,
+      fontFamily: 'Oxygen',
+      fontWeight: FontWeight.w400,
+    ),
+    headlineLarge: TextStyle(
+      color: appTheme.whiteA700,
+      fontSize: 32.fSize,
+      fontFamily: 'Oxygen',
+      fontWeight: FontWeight.w400,
+    ),
+    headlineMedium: TextStyle(
+      color: appTheme.gray900,
+      fontSize: 26.fSize,
+      fontFamily: 'Oxygen',
+      fontWeight: FontWeight.w700,
+    ),
+    headlineSmall: TextStyle(
+      color: colorScheme.onErrorContainer.withOpacity(1),
+      fontSize: 25.fSize,
+      fontFamily: 'Oxygen',
+      fontWeight: FontWeight.w700,
+    ),
+    titleLarge: TextStyle(
+      color: colorScheme.onErrorContainer.withOpacity(1),
+      fontSize: 20.fSize,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w500,
+    ),
+    titleMedium: TextStyle(
+      color: Color(0XFF000000),
+      fontSize: 16.fSize,
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w600,
+    ),
+    titleSmall: TextStyle(
+      color: appTheme.gray500,
+      fontSize: 14.fSize,
+      fontFamily: 'Oxygen',
+      fontWeight: FontWeight.w700,
+    ),
+  );
 }
 
 /// Class containing the supported color schemes.
 class ColorSchemes {
   static final primaryColorScheme = ColorScheme.light(
     // Primary colors
-    primary: Color(0XFFCDD1E0),
-    primaryContainer: Color(0XFF0274BA),
-    secondaryContainer: Color(0X6D1E1E1E),
+    primary: Color(0XFF0274BA),
+    primaryContainer: Color(0X6D1E1E1E),
+    secondaryContainer: Color(0XFF6C6C6C),
 
     // Error colors
-    errorContainer: Color(0XFF999EA1),
-    onError: Color(0XFF000000),
+    errorContainer: Color(0XFF242A31),
+    onErrorContainer: Color(0X3F000000),
 
     // On colors(text colors)
-    onPrimary: Color(0XFF242A31),
-    onPrimaryContainer: Color(0XFF000C14),
-    onSecondaryContainer: Color(0XFFC5C5C5),
+    onPrimary: Color(0XFF000C14),
+    onPrimaryContainer: Color(0XFFB7B7B7),
   );
 }
 
@@ -175,11 +186,21 @@ class PrimaryColors {
   // Black
   Color get black900 => Color(0XFF000B14);
 
+  // BlueGray
+  Color get blueGray100 => Color(0XFFCDD1E0);
+  Color get blueGray400 => Color(0XFF8390A1);
+
   // Gray
-  Color get gray500 => Color(0XFF9E9E9E);
+  Color get gray400 => Color(0XFFC5C5C5);
+  Color get gray500 => Color(0XFF999EA1);
+  Color get gray50001 => Color(0XFF9E9E9E);
+  Color get gray900 => Color(0XFF1E232C);
 
   // Red
   Color get red500 => Color(0XFFEB4335);
+
+  // Teal
+  Color get teal400 => Color(0XFF18C079);
 
   // White
   Color get whiteA700 => Color(0XFFFFFFFF);

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:park_notify/core/app_export.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
-// ignore: must_be_immutable
 class CustomPhoneNumber extends StatelessWidget {
   CustomPhoneNumber({
     Key? key,
@@ -31,7 +30,7 @@ class CustomPhoneNumber extends StatelessWidget {
           10.h,
         ),
         border: Border.all(
-          color: theme.colorScheme.primary,
+          color: appTheme.blueGray100,
           width: 1.h,
         ),
       ),
@@ -55,7 +54,7 @@ class CustomPhoneNumber extends StatelessWidget {
                 ),
                 child: Text(
                   "+${country.phoneCode}",
-                  style: CustomTextStyles.titleSmallOnError,
+                  style: CustomTextStyles.titleSmallOnErrorContainer,
                 ),
               ),
             ),

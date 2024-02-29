@@ -8,7 +8,6 @@ import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_phone_number.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
-// ignore_for_file: must_be_immutable
 class CreateAccountScreen extends StatelessWidget {
   CreateAccountScreen({Key? key}) : super(key: key);
 
@@ -22,7 +21,7 @@ class CreateAccountScreen extends StatelessWidget {
 
   bool rememberMe = false;
 
-  bool agreeWithTermsConditions = false;
+  bool agreewithTermsConditions = false;
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -59,13 +58,13 @@ class CreateAccountScreen extends StatelessWidget {
                                   SizedBox(height: 51.v),
                                   _buildNinetyFour(context),
                                   SizedBox(height: 9.v),
-                                  _buildPhoneNumber1(context),
+                                  _buildPhoneNumber(context),
                                   SizedBox(height: 15.v),
                                   _buildNinetyEight(context),
                                   SizedBox(height: 19.v),
                                   _buildRememberMe(context),
                                   SizedBox(height: 18.v),
-                                  _buildAgreeWithTermsConditions(context),
+                                  _buildAgreewithTermsConditions(context),
                                   SizedBox(height: 29.v),
                                   _buildSignupButton(context),
                                   SizedBox(height: 22.v),
@@ -78,18 +77,10 @@ class CreateAccountScreen extends StatelessWidget {
                                             padding: EdgeInsets.only(left: 8.h),
                                             child: Text("Sign in",
                                                 style: CustomTextStyles
-                                                    .titleSmallPrimaryContainer))
+                                                    .titleSmallPrimary))
                                       ])),
                                   SizedBox(height: 5.v)
                                 ])))))));
-  }
-
-  /// Section Widget
-  Widget _buildEmail(BuildContext context) {
-    return CustomTextFormField(
-        controller: emailController,
-        hintText: "Enter your email",
-        textInputType: TextInputType.emailAddress);
   }
 
   /// Section Widget
@@ -99,47 +90,27 @@ class CreateAccountScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("Email​ address", style: theme.textTheme.bodyMedium),
           SizedBox(height: 7.v),
-          _buildEmail(context)
+          CustomTextFormField(
+              controller: emailController,
+              hintText: "Enter your email",
+              textInputType: TextInputType.emailAddress)
         ]));
   }
 
   /// Section Widget
   Widget _buildPhoneNumber(BuildContext context) {
-    return CustomPhoneNumber(
-        country: selectedCountry,
-        controller: phoneNumberController,
-        onTap: (Country value) {
-          selectedCountry = value;
-        });
-  }
-
-  /// Section Widget
-  Widget _buildPhoneNumber1(BuildContext context) {
     return Padding(
         padding: EdgeInsets.only(left: 1.h),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("Phone number", style: theme.textTheme.bodyMedium),
           SizedBox(height: 7.v),
-          _buildPhoneNumber(context)
+          CustomPhoneNumber(
+              country: selectedCountry,
+              controller: phoneNumberController,
+              onTap: (Country value) {
+                selectedCountry = value;
+              })
         ]));
-  }
-
-  /// Section Widget
-  Widget _buildPassword(BuildContext context) {
-    return CustomTextFormField(
-        controller: passwordController,
-        hintText: "Please Enter Your Password",
-        textInputAction: TextInputAction.done,
-        textInputType: TextInputType.visiblePassword,
-        suffix: Container(
-            margin: EdgeInsets.fromLTRB(30.h, 12.v, 17.h, 11.v),
-            child: CustomImageView(
-                imagePath: ImageConstant.imgEyefill,
-                height: 18.adaptSize,
-                width: 18.adaptSize)),
-        suffixConstraints: BoxConstraints(maxHeight: 41.v),
-        obscureText: true,
-        contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v));
   }
 
   /// Section Widget
@@ -149,7 +120,21 @@ class CreateAccountScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("Password", style: theme.textTheme.bodyMedium),
           SizedBox(height: 7.v),
-          _buildPassword(context)
+          CustomTextFormField(
+              controller: passwordController,
+              hintText: "Please Enter Your Password",
+              textInputAction: TextInputAction.done,
+              textInputType: TextInputType.visiblePassword,
+              suffix: Container(
+                  margin: EdgeInsets.fromLTRB(30.h, 12.v, 17.h, 11.v),
+                  child: CustomImageView(
+                      imagePath: ImageConstant.imgEyefill,
+                      height: 18.adaptSize,
+                      width: 18.adaptSize)),
+              suffixConstraints: BoxConstraints(maxHeight: 41.v),
+              obscureText: true,
+              contentPadding:
+              EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v))
         ]));
   }
 
@@ -167,66 +152,32 @@ class CreateAccountScreen extends StatelessWidget {
   }
 
   /// Section Widget
-  Widget _buildAgreeWithTermsConditions(BuildContext context) {
+  Widget _buildAgreewithTermsConditions(BuildContext context) {
     return Padding(
         padding: EdgeInsets.only(left: 1.h),
         child: CustomCheckboxButton(
             text: "Agree with Terms & Conditions",
-            value: agreeWithTermsConditions,
+            value: agreewithTermsConditions,
             onChange: (value) {
-              agreeWithTermsConditions = value;
+              agreewithTermsConditions = value;
             }));
-  }
-
-  /// Section Widget
-  Widget _buildContinueButton(BuildContext context) {
-    return CustomElevatedButton(
-        text: "Continue",
-        onPressed: () {
-          onTapContinueButton(context);
-        });
-  }
-
-  /// Section Widget
-  Widget _buildContinueWithGoogleButton(BuildContext context) {
-    return CustomOutlinedButton(
-        text: "Continue with Google",
-        leftIcon: Container(
-            margin: EdgeInsets.only(right: 14.h),
-            child: CustomImageView(
-                imagePath: ImageConstant.imgGoogle,
-                height: 24.adaptSize,
-                width: 24.adaptSize)),
-        onPressed: () {
-          onTapContinueWithGoogleButton(context);
-        });
-  }
-
-  /// Section Widget
-  Widget _buildContinueWithAppleButton(BuildContext context) {
-    return CustomOutlinedButton(
-        text: "     Continue with Apple",
-        leftIcon: Container(
-            margin: EdgeInsets.only(right: 4.h),
-            child: CustomImageView(
-                imagePath: ImageConstant.imgImage1, height: 37.v, width: 30.h)),
-        buttonStyle: CustomButtonStyles.outlinePrimaryTL10,
-        buttonTextStyle: CustomTextStyles.titleSmallWhiteA700,
-        onPressed: () {
-          onTapContinueWithAppleButton(context);
-        });
   }
 
   /// Section Widget
   Widget _buildSignupButton(BuildContext context) {
     return Column(children: [
-      _buildContinueButton(context),
+      CustomElevatedButton(
+          text: "Continue",
+          buttonTextStyle: CustomTextStyles.titleMediumOxygenWhiteA700,
+          onPressed: () {
+            onTapContinue(context);
+          }),
       SizedBox(height: 22.v),
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Padding(
             padding: EdgeInsets.only(top: 9.v, bottom: 8.v),
             child: SizedBox(width: 135.h, child: Divider())),
-        Text("Or", style: CustomTextStyles.titleSmallOnPrimary_1),
+        Text("Or", style: CustomTextStyles.titleSmallErrorContainer_1),
         Container(
             height: 1.v,
             width: 170.h,
@@ -241,24 +192,46 @@ class CreateAccountScreen extends StatelessWidget {
             ]))
       ]),
       SizedBox(height: 14.v),
-      _buildContinueWithGoogleButton(context),
+      CustomOutlinedButton(
+          text: "Continue with Google",
+          leftIcon: Container(
+              margin: EdgeInsets.only(right: 14.h),
+              child: CustomImageView(
+                  imagePath: ImageConstant.imgGoogle,
+                  height: 24.adaptSize,
+                  width: 24.adaptSize)),
+          onPressed: () {
+            onTapContinueWithGoogle(context);
+          }),
       SizedBox(height: 22.v),
-      _buildContinueWithAppleButton(context)
+      CustomOutlinedButton(
+          text: "     Continue with Apple",
+          leftIcon: Container(
+              margin: EdgeInsets.only(right: 4.h),
+              child: CustomImageView(
+                  imagePath: ImageConstant.imgImage1,
+                  height: 37.v,
+                  width: 30.h)),
+          buttonStyle: CustomButtonStyles.outlineBlueGrayTL10,
+          buttonTextStyle: CustomTextStyles.titleSmallWhiteA700,
+          onPressed: () {
+            onTapContinueWithApple(context);
+          })
     ]);
   }
 
   /// Navigates to the registerYourVehicleScreen when the action is triggered.
-  onTapContinueButton(BuildContext context) {
+  onTapContinue(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 
   /// Navigates to the registerYourVehicleScreen when the action is triggered.
-  onTapContinueWithGoogleButton(BuildContext context) {
+  onTapContinueWithGoogle(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 
   /// Navigates to the registerYourVehicleScreen when the action is triggered.
-  onTapContinueWithAppleButton(BuildContext context) {
+  onTapContinueWithApple(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 }

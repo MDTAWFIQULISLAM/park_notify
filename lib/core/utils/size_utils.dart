@@ -7,10 +7,10 @@ const num FIGMA_DESIGN_WIDTH = 430;
 const num FIGMA_DESIGN_HEIGHT = 932;
 const num FIGMA_DESIGN_STATUS_BAR = 0;
 typedef ResponsiveBuild = Widget Function(
-  BuildContext context,
-  Orientation orientation,
-  DeviceType deviceType,
-);
+    BuildContext context,
+    Orientation orientation,
+    DeviceType deviceType,
+    );
 
 class Sizer extends StatelessWidget {
   const Sizer({
@@ -51,9 +51,9 @@ class SizeUtils {
   static late double width;
 
   static void setScreenSize(
-    BoxConstraints constraints,
-    Orientation currentOrientation,
-  ) {
+      BoxConstraints constraints,
+      Orientation currentOrientation,
+      ) {
     // Sets boxConstraints and orientation
     boxConstraints = constraints;
     orientation = currentOrientation;

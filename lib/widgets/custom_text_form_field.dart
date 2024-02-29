@@ -27,8 +27,8 @@ class CustomTextFormField extends StatelessWidget {
     this.filled = true,
     this.validator,
   }) : super(
-          key: key,
-        );
+    key: key,
+  );
 
   final Alignment? alignment;
 
@@ -78,63 +78,63 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return alignment != null
         ? Align(
-            alignment: alignment ?? Alignment.center,
-            child: textFormFieldWidget(context),
-          )
+      alignment: alignment ?? Alignment.center,
+      child: textFormFieldWidget(context),
+    )
         : textFormFieldWidget(context);
   }
 
   Widget textFormFieldWidget(BuildContext context) => SizedBox(
-        width: width ?? double.maxFinite,
-        child: TextFormField(
-          scrollPadding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          controller: controller,
-          focusNode: focusNode ?? FocusNode(),
-          autofocus: autofocus!,
-          style: textStyle ?? CustomTextStyles.titleSmallSecondaryContainer,
-          obscureText: obscureText!,
-          textInputAction: textInputAction,
-          keyboardType: textInputType,
-          maxLines: maxLines ?? 1,
-          decoration: decoration,
-          validator: validator,
-        ),
-      );
+    width: width ?? double.maxFinite,
+    child: TextFormField(
+      scrollPadding:
+      EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      controller: controller,
+      focusNode: focusNode ?? FocusNode(),
+      autofocus: autofocus!,
+      style: textStyle ?? CustomTextStyles.titleSmallPrimaryContainer,
+      obscureText: obscureText!,
+      textInputAction: textInputAction,
+      keyboardType: textInputType,
+      maxLines: maxLines ?? 1,
+      decoration: decoration,
+      validator: validator,
+    ),
+  );
   InputDecoration get decoration => InputDecoration(
-        hintText: hintText ?? "",
-        hintStyle: hintStyle ?? CustomTextStyles.titleSmallGray500,
-        prefixIcon: prefix,
-        prefixIconConstraints: prefixConstraints,
-        suffixIcon: suffix,
-        suffixIconConstraints: suffixConstraints,
-        isDense: true,
-        contentPadding: contentPadding ?? EdgeInsets.all(11.h),
-        fillColor: fillColor ?? appTheme.whiteA700,
-        filled: filled,
-        border: borderDecoration ??
-            OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.h),
-              borderSide: BorderSide(
-                color: theme.colorScheme.onSecondaryContainer,
-                width: 1,
-              ),
-            ),
-        enabledBorder: borderDecoration ??
-            OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.h),
-              borderSide: BorderSide(
-                color: theme.colorScheme.onSecondaryContainer,
-                width: 1,
-              ),
-            ),
-        focusedBorder: borderDecoration ??
-            OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.h),
-              borderSide: BorderSide(
-                color: theme.colorScheme.onSecondaryContainer,
-                width: 1,
-              ),
-            ),
-      );
+    hintText: hintText ?? "",
+    hintStyle: hintStyle ?? CustomTextStyles.titleSmallGray50001,
+    prefixIcon: prefix,
+    prefixIconConstraints: prefixConstraints,
+    suffixIcon: suffix,
+    suffixIconConstraints: suffixConstraints,
+    isDense: true,
+    contentPadding: contentPadding ?? EdgeInsets.all(11.h),
+    fillColor: fillColor ?? appTheme.whiteA700,
+    filled: filled,
+    border: borderDecoration ??
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.h),
+          borderSide: BorderSide(
+            color: appTheme.gray400,
+            width: 1,
+          ),
+        ),
+    enabledBorder: borderDecoration ??
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.h),
+          borderSide: BorderSide(
+            color: appTheme.gray400,
+            width: 1,
+          ),
+        ),
+    focusedBorder: borderDecoration ??
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.h),
+          borderSide: BorderSide(
+            color: appTheme.gray400,
+            width: 1,
+          ),
+        ),
+  );
 }

@@ -7,7 +7,7 @@ class ImageConstant {
 
   static String imgGoogle = '$imagePath/img_google.svg';
 
-  static String imgImage1 = '$imagePath/img_image_1';
+  static String imgImage1 = '$imagePath/img_image_1.png';
 
   static String imgEyefill = '$imagePath/img_eyefill.png';
 

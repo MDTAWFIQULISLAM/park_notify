@@ -35,6 +35,9 @@ dev_dependencies:
     sdk: flutter
 
   flutter_launcher_icons: "^0.13.1"
+  google_maps_flutter: "^2.0.10"
+  geocoding: "^2.0.0"
+  geolocator: "^7.0.3"
 
 flutter_launcher_icons:
   android: true

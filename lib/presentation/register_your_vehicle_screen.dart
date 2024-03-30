@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:park_notify/core/app_export.dart';
-import 'package:park_notify/widgets/custom_checkbox_button.dart';
+import 'package:park_notify/widgets/custom_checkbox_button.dart'; // Importing CustomCheckbox
 import 'package:park_notify/widgets/custom_elevated_button.dart';
+import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
 class RegisterYourVehicleScreen extends StatelessWidget {
-  RegisterYourVehicleScreen({Key? key})
-      : super(
-          key: key,
-        );
+  RegisterYourVehicleScreen({Key? key}) : super(key: key);
 
   TextEditingController registrationNumberPlaceholderController =
-      TextEditingController();
+  TextEditingController();
 
   bool rememberForFutureUse = false;
 
@@ -19,66 +17,27 @@ class RegisterYourVehicleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: SizedBox(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        child: Container(
           width: SizeUtils.width,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                width: double.maxFinite,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 31.h,
-                  vertical: 55.v,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 48.v,
-                      width: 252.h,
-                      margin: EdgeInsets.only(left: 6.h),
-                      child: Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 1.h),
-                              child: Text(
-                                "You are almost there.",
-                                style: theme.textTheme.titleSmall,
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.topCenter,
-                            child: Text(
-                              "Register Your Vehicle ",
-                              style: theme.textTheme.headlineSmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 54.v),
-                    _buildVehicleRegistration(context),
-                    SizedBox(height: 17.v),
-                    _buildRememberForFutureUse(context),
-                    SizedBox(height: 24.v),
-                    CustomElevatedButton(
-                      text: "Continue ",
-                      margin: EdgeInsets.only(right: 9.h),
-                    ),
-                    SizedBox(height: 5.v),
-                  ],
-                ),
-              ),
+          padding: EdgeInsets.symmetric(horizontal: 34.h, vertical: 53.v),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Register Your Vehicle", style: theme.textTheme.headlineSmall),
+                SizedBox(height: 2.v),
+                Text("You are almost there.", style: theme.textTheme.titleSmall),
+                SizedBox(height: 51.v),
+                _buildVehicleRegistration(context),
+                SizedBox(height: 9.v),
+                _buildRememberForFutureUse(context),
+                SizedBox(height: 29.v),
+                _buildContinueButton(context),
+              ],
             ),
           ),
         ),
@@ -86,25 +45,17 @@ class RegisterYourVehicleScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildVehicleRegistration(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: 3.h,
-        right: 5.h,
-      ),
+      padding: EdgeInsets.only(left: 1.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Vehicle Registration Number",
-            style: CustomTextStyles.titleSmallPrimaryContainer,
-          ),
-          SizedBox(height: 5.v),
+          Text("Vehicle Registration Number", style: theme.textTheme.bodyMedium),
+          SizedBox(height: 7.v),
           CustomTextFormField(
             controller: registrationNumberPlaceholderController,
             hintText: "Enter your Vehicle Registration Number",
-            textInputAction: TextInputAction.done,
             textInputType: TextInputType.number,
           ),
         ],
@@ -112,18 +63,39 @@ class RegisterYourVehicleScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildRememberForFutureUse(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 4.h),
-      child: CustomCheckboxButton(
-        text: "Remember for future use",
-        value: rememberForFutureUse,
-        padding: EdgeInsets.symmetric(vertical: 1.v),
-        onChange: (value) {
-          rememberForFutureUse = value;
-        },
+      padding: EdgeInsets.only(left: 1.h),
+      child: Row(
+        children: [
+          CustomCheckbox(
+            value: rememberForFutureUse,
+            onChanged: (value) {
+              rememberForFutureUse = value!;
+            },
+          ),
+          SizedBox(width: 10),
+          Text("Remember for future use", style: TextStyle(fontSize: 16)),
+        ],
       ),
     );
+  }
+
+  Widget _buildContinueButton(BuildContext context) {
+    return Column(
+      children: [
+        CustomElevatedButton(
+          text: "Continue",
+          buttonTextStyle: CustomTextStyles.titleMediumOxygenWhiteA700,
+          onPressed: () {
+            onTapContinue(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  void onTapContinue(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 }

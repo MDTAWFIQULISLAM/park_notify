@@ -1,84 +1,111 @@
-import 'package:park_notify/widgets/custom_search_view.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:park_notify/widgets/custom_search_view.dart';
 import 'package:park_notify/core/app_export.dart';
 
-class MapPageRefinedTanvirScreen extends StatelessWidget {
-  MapPageRefinedTanvirScreen({Key? key})
-      : super(
-          key: key,
-        );
+class MapPageRefinedTanvirScreen extends StatefulWidget {
+  MapPageRefinedTanvirScreen({Key? key}) : super(key: key);
 
+  @override
+  _MapPageRefinedTanvirScreenState createState() =>
+      _MapPageRefinedTanvirScreenState();
+}
+
+class _MapPageRefinedTanvirScreenState
+    extends State<MapPageRefinedTanvirScreen> {
+  late GoogleMapController _mapController;
   TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+  Position? _currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserLocation();
+  }
+
+  Future<void> _getUserLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          width: SizeUtils.width,
-          height: SizeUtils.height,
-          decoration: BoxDecoration(
-            color: appTheme.whiteA700,
-            image: DecorationImage(
-              image: AssetImage(
-                ImageConstant.imgGroup87,
+    return Scaffold(
+      body: Stack(
+        children: [
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: LatLng(0, 0),
+              zoom: 14,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            // Add more map options as needed
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomSearchView(
+                      controller: searchController,
+                      hintText: 'Search Address or Postcode',
+                      onSubmitted: (value) {
+                        _searchLocation(value);
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      _searchLocation(searchController.text);
+                    },
+                  ),
+                ],
               ),
-              fit: BoxFit.cover,
             ),
           ),
-          child: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 735.v),
-                _buildScrollView(context),
-              ],
-            ),
-          ),
-        ),
+        ],
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildScrollView(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.h),
-          padding: EdgeInsets.symmetric(
-            horizontal: 32.h,
-            vertical: 23.v,
-          ),
-          decoration: AppDecoration.outlineOnErrorContainer.copyWith(
-            borderRadius: BorderRadiusStyle.roundedBorder30,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 56.h,
-                child: Divider(
-                  color: theme.colorScheme.secondaryContainer,
-                ),
-              ),
-              SizedBox(height: 21.v),
-              CustomSearchView(
-                controller: searchController,
-                hintText: "Where to?",
-                contentPadding: EdgeInsets.symmetric(vertical: 9.v),
-                borderDecoration:
-                    SearchViewStyleHelper.outlineOnPrimaryContainer,
-              ),
-              SizedBox(height: 21.v),
-            ],
-          ),
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      _mapController = controller;
+    });
+  }
+
+  Future<void> _searchLocation(String query) async {
+    List<Location> locations = await locationFromAddress(query);
+    if (locations.isNotEmpty) {
+      final LatLng latLng =
+      LatLng(locations.first.latitude!, locations.first.longitude!);
+      // Move the camera to the searched location
+      _mapController.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+    } else {
+      // Handle case when no location is found
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Location not found'),
         ),
-      ),
-    );
+      );
+    }
   }
 }

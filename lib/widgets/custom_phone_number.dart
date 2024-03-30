@@ -15,20 +15,17 @@ class CustomPhoneNumber extends StatelessWidget {
     key: key,
   );
 
-  Country country;
-
-  Function(Country) onTap;
-
-  TextEditingController? controller;
+  final Country country;
+  final Function(Country) onTap;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 44.v, // Adjusted height to match text field height
       decoration: BoxDecoration(
         color: appTheme.whiteA700,
-        borderRadius: BorderRadius.circular(
-          10.h,
-        ),
+        borderRadius: BorderRadius.circular(10.h),
         border: Border.all(
           color: appTheme.blueGray100,
           width: 1.h,
@@ -41,35 +38,22 @@ class CustomPhoneNumber extends StatelessWidget {
               _openCountryPicker(context);
             },
             child: Padding(
-              padding: EdgeInsets.only(
-                left: 15.h,
-                top: 6.v,
-                bottom: 6.v,
-              ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: 6.v,
-                  right: 15.h,
-                  bottom: 3.v,
-                ),
-                child: Text(
-                  "+${country.phoneCode}",
-                  style: CustomTextStyles.titleSmallOnErrorContainer,
-                ),
+              padding: EdgeInsets.symmetric(vertical: 6.v, horizontal: 15.h),
+              child: Text(
+                "+${country.phoneCode}",
+                style: CustomTextStyles.titleSmallOnErrorContainer,
               ),
             ),
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(
-                left: 8.h,
-                right: 5.h,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 6.v, horizontal: 8.h),
               child: CustomTextFormField(
-                width: 290.h,
                 controller: controller,
-                hintText: "Enter your phonenumber",
+                hintText: "Enter your phone number",
                 textInputType: TextInputType.phone,
+                contentPadding: EdgeInsets.zero, // Remove default content padding
+                borderDecoration: InputBorder.none, // Remove default border decoration
               ),
             ),
           ),
@@ -82,9 +66,7 @@ class CustomPhoneNumber extends StatelessWidget {
     children: <Widget>[
       CountryPickerUtils.getDefaultFlagImage(country),
       Container(
-        margin: EdgeInsets.only(
-          left: 10.h,
-        ),
+        margin: EdgeInsets.only(left: 10.h),
         width: 60.h,
         child: Text(
           "+${country.phoneCode}",
@@ -100,6 +82,7 @@ class CustomPhoneNumber extends StatelessWidget {
       ),
     ],
   );
+
   void _openCountryPicker(BuildContext context) => showDialog(
     context: context,
     builder: (context) => CountryPickerDialog(

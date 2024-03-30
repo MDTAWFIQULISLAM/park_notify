@@ -1,8 +1,8 @@
-#Park Notify: Simplifying Parking Hassles**
+**Park Notify: Simplifying Parking Hassles**
 
 Park Notify is your ultimate companion for stress-free parking experiences. Designed with convenience in mind, this innovative mobile app revolutionizes the way you park, pay parking fees, and avoid fines. Say goodbye to the frustrations of hunting for parking spots and worrying about overstaying your welcome – Park Notify has you covered.
 
-##Features:
+**Features:**
 
 1. **Real-Time Parking Availability**: Park Notify provides real-time information on available parking spots near your location. Using advanced algorithms and data integration with parking facilities, the app ensures you find a spot quickly and effortlessly.
 

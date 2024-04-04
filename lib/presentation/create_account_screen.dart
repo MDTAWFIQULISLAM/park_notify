@@ -24,6 +24,8 @@ class CreateAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool _obscureText = true; // Initially obscure the text
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -41,7 +43,7 @@ class CreateAccountScreen extends StatelessWidget {
               SizedBox(height: 9.v),
               _buildPhoneNumber(context),
               SizedBox(height: 15.v),
-              _buildPassword(context),
+              _buildPassword(context, _obscureText),
               SizedBox(height: 19.v),
               _buildRememberMe(context),
               SizedBox(height: 18.v),
@@ -126,7 +128,7 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPassword(BuildContext context) {
+  Widget _buildPassword(BuildContext context, bool obscureText) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
       child: Column(
@@ -134,22 +136,31 @@ class CreateAccountScreen extends StatelessWidget {
         children: [
           Text("Password", style: theme.textTheme.bodyMedium),
           SizedBox(height: 7.v),
-          CustomTextFormField(
-            controller: passwordController,
-            hintText: "Please Enter Your Password",
-            textInputAction: TextInputAction.done,
-            textInputType: TextInputType.visiblePassword,
-            obscureText: true,
-            suffix: Container(
-              margin: EdgeInsets.fromLTRB(30.h, 12.v, 17.h, 11.v),
-              child: CustomImageView(
-                imagePath: ImageConstant.imgEyefill,
-                height: 18.adaptSize,
-                width: 18.adaptSize,
+          Stack(
+            alignment: Alignment.centerRight,
+            children: [
+              CustomTextFormField(
+                controller: passwordController,
+                hintText: "Please Enter Your Password",
+                textInputAction: TextInputAction.done,
+                textInputType: TextInputType.visiblePassword,
+                obscureText: obscureText, // Use the obscureText property
+                contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
               ),
-            ),
-            suffixConstraints: BoxConstraints(maxHeight: 41.v),
-            contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
+              GestureDetector(
+                onTap: () {
+                  // Toggle the password visibility
+                  obscureText = !obscureText;
+                },
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
+                  child: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

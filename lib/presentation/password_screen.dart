@@ -18,10 +18,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool _obscurePassword = true; // Indicates whether to obscure the password
-
   @override
   Widget build(BuildContext context) {
+    bool _obscurePassword = true; // Initially obscure the password
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -35,7 +35,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               children: [
                 Text("You are almost there..", style: theme.textTheme.headlineSmall),
                 SizedBox(height: 57.v),
-                _buildPasswordTextField(context),
+                _buildPasswordTextField(context, _obscurePassword),
                 SizedBox(height: 28.v),
                 _buildRememberMe(context),
                 SizedBox(height: 27.v),
@@ -49,7 +49,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     );
   }
 
-  Widget _buildPasswordTextField(BuildContext context) {
+  Widget _buildPasswordTextField(BuildContext context, bool obscureText) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
       child: Column(
@@ -57,30 +57,38 @@ class _PasswordScreenState extends State<PasswordScreen> {
         children: [
           Text("Password", style: theme.textTheme.bodyMedium),
           SizedBox(height: 7.v),
-          TextFormField(
-            controller: passwordController,
-            obscureText: _obscurePassword, // Use the obscureText property
-            decoration: InputDecoration(
-              hintText: "Please Enter Your Password",
-              suffixIcon: IconButton(
-                icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-                onPressed: () {
-                  // Toggle the visibility of the password
+          Stack(
+            alignment: Alignment.centerRight,
+            children: [
+              CustomTextFormField(
+                controller: passwordController,
+                hintText: "Please Enter Your Password",
+                textInputAction: TextInputAction.done,
+                textInputType: TextInputType.visiblePassword,
+                obscureText: obscureText, // Use the obscureText property
+                contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // Toggle the password visibility
                   setState(() {
-                    _obscurePassword = !_obscurePassword;
+                    obscureText = !obscureText;
                   });
                 },
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
+                  child: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
-              contentPadding: EdgeInsets.symmetric(vertical: 11.v, horizontal: 13.h), // Add contentPadding
-            ),
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.visiblePassword,
+            ],
           ),
         ],
       ),
     );
   }
-
 
   Widget _buildRememberMe(BuildContext context) {
     return Padding(

@@ -4,7 +4,7 @@ import 'package:park_notify/presentation/login_two_screen.dart';
 import 'package:park_notify/presentation/password_screen.dart';
 import 'package:park_notify/presentation/create_account_screen.dart';
 import 'package:park_notify/presentation/register_your_vehicle_screen.dart';
-import 'package:park_notify/presentation/map_page_refined_tanvir_screen.dart';
+import 'package:park_notify/presentation/map_page_refined_tanvir_screen.dart.dart';
 import 'package:park_notify/presentation/refined_final_screen.dart';
 import 'package:park_notify/presentation/enter_destination_maimuna_screen.dart';
 import 'package:park_notify/presentation/choose_parking_one_screen.dart';

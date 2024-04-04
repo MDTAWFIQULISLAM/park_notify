@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:park_notify/widgets/custom_search_view.dart';
-import 'package:park_notify/core/app_export.dart';
 
 class MapPageRefinedTanvirScreen extends StatefulWidget {
-  MapPageRefinedTanvirScreen({Key? key}) : super(key: key);
+  const MapPageRefinedTanvirScreen({Key? key}) : super(key: key);
 
   @override
   _MapPageRefinedTanvirScreenState createState() =>
@@ -63,12 +61,11 @@ class _MapPageRefinedTanvirScreenState
               child: Row(
                 children: [
                   Expanded(
-                    child: CustomSearchView(
+                    child: TextField(
                       controller: searchController,
-                      hintText: 'Search Address or Postcode',
-                      onSubmitted: (value) {
-                        _searchLocation(value);
-                      },
+                      decoration: InputDecoration(
+                        hintText: 'Search Address or Postcode',
+                      ),
                     ),
                   ),
                   IconButton(
@@ -108,4 +105,10 @@ class _MapPageRefinedTanvirScreenState
       );
     }
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: MapPageRefinedTanvirScreen(),
+  ));
 }

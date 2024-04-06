@@ -49,8 +49,9 @@ flutter_launcher_icons:
 
 flutter:
   assets:
-    - assets/images/
-
+    - assets/images/get_started.png
+    - assets/images/img_google.svg
+    - assets/images/img_image_1.png
 
 
 

@@ -4,6 +4,7 @@ import 'package:park_notify/widgets/custom_checkbox_button.dart'; // Importing C
 import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
+import 'package:park_notify/presentation/Map_page.dart';
 
 class RegisterYourVehicleScreen extends StatelessWidget {
   RegisterYourVehicleScreen({Key? key}) : super(key: key);
@@ -96,6 +97,6 @@ class RegisterYourVehicleScreen extends StatelessWidget {
   }
 
   void onTapContinue(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    Navigator.pushNamed(context, AppRoutes.mapPage);
   }
 }

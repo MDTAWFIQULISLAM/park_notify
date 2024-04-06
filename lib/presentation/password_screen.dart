@@ -119,6 +119,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
   }
 
   void onTapContinue(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.mapPageRefinedTanvirScreen);
+    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 }

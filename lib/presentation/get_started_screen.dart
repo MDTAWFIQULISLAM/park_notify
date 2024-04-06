@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:park_notify/core/app_export.dart';
 import 'package:park_notify/widgets/custom_elevated_button.dart';
+import 'package:park_notify/routes/app_routes.dart';
 
 class GetStartedScreen extends StatelessWidget {
   const GetStartedScreen({Key? key}) : super(key: key);
@@ -60,6 +61,6 @@ class GetStartedScreen extends StatelessWidget {
 
   /// Navigates to the loginTwoScreen when the action is triggered.
   onTapGetStarted(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.loginTwoScreen);
+    Navigator.pushNamed(context, AppRoutes.signInPage);
   }
 }

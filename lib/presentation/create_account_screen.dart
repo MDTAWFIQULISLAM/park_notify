@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:park_notify/core/app_export.dart';
-import 'package:park_notify/widgets/custom_checkbox_button.dart'; // Importing CustomCheckbox
 import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_phone_number.dart';
@@ -14,9 +13,7 @@ class CreateAccountScreen extends StatelessWidget {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  bool rememberMe = false;
-  bool agreeWithTermsConditions = false;
+  TextEditingController confirmPasswordController = TextEditingController();
 
   Country selectedCountry = CountryPickerUtils.getCountryByPhoneCode('44');
 
@@ -44,49 +41,33 @@ class CreateAccountScreen extends StatelessWidget {
               _buildPhoneNumber(context),
               SizedBox(height: 15.v),
               _buildPassword(context, _obscureText),
+              SizedBox(height: 15.v), // Add space between Password and Confirm Password
+              _buildConfirmPassword(context, _obscureText),
               SizedBox(height: 19.v),
-              _buildRememberMe(context),
-              SizedBox(height: 18.v),
-              _buildAgreeWithTermsConditions(context),
-              SizedBox(height: 29.v),
-              _buildSignupButton(context),
+              _buildContinueButton(context),
               SizedBox(height: 22.v),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 9.v, bottom: 8.v),
-                    child: SizedBox(width: 135.h, child: Divider()),
-                  ),
-                  Text("Or", style: CustomTextStyles.titleSmallErrorContainer_1),
-                  Container(
-                    height: 1.v,
-                    width: 170.h,
-                    margin: EdgeInsets.symmetric(vertical: 8.v),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(width: 170.h, child: Divider()),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(width: 170.h, child: Divider()),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 14.v),
+              _buildWith(context), // Add this line to include the "Or" section
+              SizedBox(height: 22.v),
               _buildContinueWithGoogle(context),
               SizedBox(height: 22.v),
               _buildContinueWithApple(context),
+              SizedBox(height: 22.v),
+              _buildSignInLink(context),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildWith(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(width: 135.h, child: Divider()),
+        Text("Or", style: CustomTextStyles.titleSmallErrorContainer_1),
+        SizedBox(width: 170.h, child: Divider()),
+      ],
     );
   }
 
@@ -141,7 +122,7 @@ class CreateAccountScreen extends StatelessWidget {
             children: [
               CustomTextFormField(
                 controller: passwordController,
-                hintText: "Please Enter Your Password",
+                hintText: "Enter your password",
                 textInputAction: TextInputAction.done,
                 textInputType: TextInputType.visiblePassword,
                 obscureText: obscureText, // Use the obscureText property
@@ -167,43 +148,47 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRememberMe(BuildContext context) {
+  Widget _buildConfirmPassword(BuildContext context, bool obscureText) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomCheckbox(
-            value: rememberMe,
-            onChanged: (value) {
-              rememberMe = value!;
-            },
+          Text("Confirm Password", style: theme.textTheme.bodyMedium),
+          SizedBox(height: 7.v),
+          Stack(
+            alignment: Alignment.centerRight,
+            children: [
+              CustomTextFormField(
+                controller: confirmPasswordController,
+                hintText: "Confirm your password",
+                textInputAction: TextInputAction.done,
+                textInputType: TextInputType.visiblePassword,
+                obscureText: obscureText, // Use the obscureText property
+                contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // Toggle the password visibility
+                  obscureText = !obscureText;
+                },
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
+                  child: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 10),
-          Text("Remember Me", style: TextStyle(fontSize: 16)),
         ],
       ),
     );
   }
 
-  Widget _buildAgreeWithTermsConditions(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 1.h),
-      child: Row(
-        children: [
-          CustomCheckbox(
-            value: agreeWithTermsConditions,
-            onChanged: (value) {
-              agreeWithTermsConditions = value!;
-            },
-          ),
-          SizedBox(width: 10),
-          Text("Agree with Terms & Conditions", style: TextStyle(fontSize: 16)),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildSignupButton(BuildContext context) {
+  Widget _buildContinueButton(BuildContext context) {
     return Column(
       children: [
         CustomElevatedButton(
@@ -237,15 +222,35 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSignInLink(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Already have an account? ", style: theme.textTheme.titleSmall),
+        GestureDetector(
+          onTap: () {
+            onTapTxtSignIn(context);
+          },
+          child: Text("Sign In", style: CustomTextStyles.titleSmallPrimary),
+        ),
+      ],
+    );
+  }
+
   void onTapContinue(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    // Navigate to the next screen or perform other actions
+    // Example: Navigator.pushNamed(context, AppRoutes.nextScreen);
   }
 
   void onTapContinueWithGoogle(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    // Implement Google sign-in logic
   }
 
   void onTapContinueWithApple(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    // Implement Apple sign-in logic
+  }
+
+  void onTapTxtSignIn(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.signInPage);
   }
 }

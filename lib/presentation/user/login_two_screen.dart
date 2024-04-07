@@ -1,12 +1,28 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:park_notify/core/app_export.dart';
+import 'package:park_notify/global/common/toast.dart';
 import 'package:park_notify/presentation/user/password_screen.dart';
 import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
-class LoginTwoScreen extends StatelessWidget {
+import 'firebase_auth_impl/firebase_auth_services.dart';
+
+class LoginTwoScreen extends StatefulWidget {
   LoginTwoScreen({Key? key}) : super(key: key);
+
+@override
+  State<StatefulWidget> createState() {
+  return _LoginTwoScreenState();
+  }
+
+}
+
+class _LoginTwoScreenState extends State<LoginTwoScreen>{
+final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   TextEditingController phoneNumberController = TextEditingController();
 
@@ -123,7 +139,7 @@ class LoginTwoScreen extends StatelessWidget {
   }
 
   onTapContinueWithGoogle(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    _signInWithGoogle();
   }
 
   onTapContinueWithApple(BuildContext context) {
@@ -133,4 +149,33 @@ class LoginTwoScreen extends StatelessWidget {
   onTapTxtSignUp(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.createAccountScreen);
   }
+
+
+_signInWithGoogle() async{
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+try {
+
+final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+
+if(googleSignInAccount != null){
+final GoogleSignInAuthentication googleSignInAuthentication = await
+googleSignInAccount.authentication;
+
+final AuthCredential credential = GoogleAuthProvider.credential(
+  idToken: googleSignInAuthentication.idToken,
+  accessToken: googleSignInAuthentication.accessToken,
+);
+
+await _firebaseAuth.signInWithCredential(credential);
+Navigator.pushNamed(context, AppRoutes.mapPageRefinedTanvirScreen);
+}
+
+}catch(e) {
+  showToast(message: 'some error occurred');
+}
+
+
+}
+
 }

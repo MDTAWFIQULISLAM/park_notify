@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:park_notify/presentation/get_started_screen.dart';
-import 'package:park_notify/presentation/login_two_screen.dart';
-import 'package:park_notify/presentation/password_screen.dart';
-import 'package:park_notify/presentation/create_account_screen.dart';
-import 'package:park_notify/presentation/register_your_vehicle_screen.dart';
+import 'package:park_notify/presentation/user/login_two_screen.dart';
+import 'package:park_notify/presentation/user/password_screen.dart';
+import 'package:park_notify/presentation/user/create_account_screen.dart';
+import 'package:park_notify/presentation/user/register_your_vehicle_screen.dart';
 import 'package:park_notify/presentation/map_page_refined_tanvir_screen.dart';
 import 'package:park_notify/presentation/refined_final_screen.dart';
 import 'package:park_notify/presentation/enter_destination_maimuna_screen.dart';
@@ -40,10 +40,11 @@ class AppRoutes {
 
   static const String appNavigationScreen = '/app_navigation_screen';
 
+
   static Map<String, WidgetBuilder> routes = {
     getStartedScreen: (context) => GetStartedScreen(),
     loginTwoScreen: (context) => LoginTwoScreen(),
-    passwordScreen: (context) => PasswordScreen(),
+    passwordScreen: (context) => PasswordScreen(username: '',),
     createAccountScreen: (context) => CreateAccountScreen(),
     registerYourVehicleScreen: (context) => RegisterYourVehicleScreen(),
     mapPageRefinedTanvirScreen: (context) => MapPageRefinedTanvirScreen(),

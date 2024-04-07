@@ -1,3 +1,10 @@
+plugins {
+  id("com.google.gms.google-services") version "4.3.8" apply false
+
+}
+
+
+
 allprojects {
     repositories {
         google()
@@ -16,3 +23,4 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+

@@ -4,8 +4,8 @@ import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
-class LoginTwoScreen extends StatelessWidget {
-  LoginTwoScreen({Key? key}) : super(key: key);
+class SignInPage extends StatelessWidget {
+  SignInPage({Key? key}) : super(key: key);
 
   TextEditingController phoneNumberController = TextEditingController();
 
@@ -22,7 +22,20 @@ class LoginTwoScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Sign in", style: theme.textTheme.headlineSmall),
+              // Logo
+              Padding(
+                padding: EdgeInsets.only(bottom: 20.v),
+                child: Image.asset(
+                '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Replace 'your_logo.png' with your image asset path
+                  width: 50, // Adjust size as needed
+                  height: 50, // Adjust size as needed
+                ),
+              ),
+              // Sign in text
+              Padding(
+                padding: EdgeInsets.only(bottom: 10.v), // Adjust spacing as needed
+                child: Text("Sign in", style: theme.textTheme.headlineSmall),
+              ),
               SizedBox(height: 5.v),
               Text("Start avoiding parking tickets now!", style: theme.textTheme.titleSmall),
               SizedBox(height: 76.v),

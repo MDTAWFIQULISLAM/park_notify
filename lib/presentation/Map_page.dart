@@ -106,11 +106,41 @@ class _MapPageState extends State<MapPage> {
             // Add more map options as needed
           ),
           Positioned(
+            top: MediaQuery.of(context).padding.top + 5.0,
+            left: 20.0,
+            child: Image.asset(
+              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
+              width: 40,
+              height: 40,
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 0.0,
+            right: 20.0,
+            child: Column(
+              children: [
+                SizedBox(height: 0), // Add space for logo
+                IconButton(
+                  icon: Icon(Icons.zoom_in),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomIn());
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.zoom_out),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomOut());
+                  },
+                ),
+              ],
+            ),
+          ),
+          Positioned(
             bottom: 20,
             left: 16.0,
             right: 16.0,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0), // Adjust border radius as needed
+              borderRadius: BorderRadius.circular(20.0),
               child: Container(
                 color: Colors.white,
                 padding:
@@ -122,7 +152,7 @@ class _MapPageState extends State<MapPage> {
                         controller: searchController,
                         decoration: InputDecoration(
                           hintText: 'Search Address or Postcode',
-                          border: InputBorder.none, // Remove TextField border
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
@@ -153,10 +183,8 @@ class _MapPageState extends State<MapPage> {
     if (locations.isNotEmpty) {
       final LatLng latLng = LatLng(locations.first.latitude!,
           locations.first.longitude!);
-      // Move the camera to the searched location
       _mapController.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
     } else {
-      // Handle case when no location is found
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Location not found'),

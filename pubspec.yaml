@@ -12,6 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  flutter_typeahead: ^3.0.0
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   country_pickers: ^2.0.0
@@ -23,6 +25,7 @@ dependencies:
   location: ^6.0.1
   geocoding: ^3.0.0
   geolocator: ^11.0.0
+  flutter_google_places: ^0.3.0
 
 dev_dependencies:
   flutter_test:

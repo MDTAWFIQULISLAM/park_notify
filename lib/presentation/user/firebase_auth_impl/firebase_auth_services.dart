@@ -4,6 +4,7 @@ import 'package:park_notify/global/common/toast.dart';
 class FirebaseAuthService {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+    
 
   Future<User?> signUpWithEmailAndPassword(String email, String password) async{
 

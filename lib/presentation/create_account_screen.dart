@@ -1,19 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:park_notify/core/app_export.dart';
+import 'package:park_notify/global/common/toast.dart';
+import 'package:park_notify/presentation/user/firebase_auth_impl/firebase_auth_services.dart';
 import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_phone_number.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class CreateAccountScreen extends StatelessWidget {
+class CreateAccountScreen extends StatefulWidget {
   CreateAccountScreen({Key? key}) : super(key: key);
+
+ @override
+  State<StatefulWidget> createState() => _CreateAccountScreenState();
+    
+}
+
+class _CreateAccountScreenState extends State<CreateAccountScreen>{
+
+  
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    phoneNumberController.dispose();
+    confirmPasswordController.dispose();
+
+    super.dispose();
+  }
 
   Country selectedCountry = CountryPickerUtils.getCountryByPhoneCode('44');
 
@@ -237,20 +262,64 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
+  
+  //sign in methods
+  
+  
   void onTapContinue(BuildContext context) {
-    // Navigate to the next screen or perform other actions
-    // Example: Navigator.pushNamed(context, AppRoutes.nextScreen);
+    _signUp();
+     Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
   }
 
-  void onTapContinueWithGoogle(BuildContext context) {
-    // Implement Google sign-in logic
+  Future<void> onTapContinueWithGoogle(BuildContext context) async {
+   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+   try{
+
+   final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+   
+   if(googleSignInAccount != null){
+    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleSignInAuthentication.idToken,
+      accessToken: googleSignInAuthentication.accessToken,
+    );
+    await _firebaseAuth.signInWithCredential(credential);
+    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+   }
+
+   }catch(e){
+
+    showToast(message: "Some error occured $e");
+   }
   }
 
+  
   void onTapContinueWithApple(BuildContext context) {
     // Implement Apple sign-in logic
   }
 
+  
   void onTapTxtSignIn(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.signInPage);
+  }
+
+  
+  
+  void _signUp() async {
+    String email = emailController.text;
+    String password = passwordController.text;
+    String phoneNumber= phoneNumberController.text;
+
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    
+    if(user != null){
+      print("User is successfully created");
+      // navigate to next screen
+      Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    }else{
+      print("Some error happened");
+    }
   }
 }

@@ -96,6 +96,6 @@ class RegisterYourVehicleScreen extends StatelessWidget {
   }
 
   void onTapContinue(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.getStartedScreen);
+    Navigator.pushNamed(context, AppRoutes.mapPage);
   }
 }

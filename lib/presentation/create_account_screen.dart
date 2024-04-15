@@ -21,7 +21,7 @@ class CreateAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool _obscureText = true; // Initially obscure the text
+    bool _obscureText = true;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

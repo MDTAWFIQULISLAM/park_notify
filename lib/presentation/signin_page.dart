@@ -22,20 +22,7 @@ class SignInPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo
-              Padding(
-                padding: EdgeInsets.only(bottom: 20.v),
-                child: Image.asset(
-                '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Replace 'your_logo.png' with your image asset path
-                  width: 50, // Adjust size as needed
-                  height: 50, // Adjust size as needed
-                ),
-              ),
-              // Sign in text
-              Padding(
-                padding: EdgeInsets.only(bottom: 10.v), // Adjust spacing as needed
-                child: Text("Sign in", style: theme.textTheme.headlineSmall),
-              ),
+              Text("Sign in", style: theme.textTheme.headlineSmall),
               SizedBox(height: 5.v),
               Text("Start avoiding parking tickets now!", style: theme.textTheme.titleSmall),
               SizedBox(height: 76.v),
@@ -129,11 +116,11 @@ class SignInPage extends StatelessWidget {
   }
 
   onTapContinueWithGoogle(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    Navigator.pushNamed(context, AppRoutes.getStartedScreen);
   }
 
   onTapContinueWithApple(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.registerYourVehicleScreen);
+    Navigator.pushNamed(context, AppRoutes.getStartedScreen);
   }
 
   onTapTxtSignUp(BuildContext context) {

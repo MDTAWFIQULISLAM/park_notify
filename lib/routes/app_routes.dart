@@ -5,6 +5,7 @@ import 'package:park_notify/presentation/password_screen.dart';
 import 'package:park_notify/presentation/create_account_screen.dart';
 import 'package:park_notify/presentation/register_your_vehicle_screen.dart';
 import 'package:park_notify/presentation/Map_page.dart';
+import 'package:park_notify/presentation/confirmed_parked_status.dart';
 
 class AppRoutes {
   static const String getStartedScreen = '/get_started_screen';
@@ -13,6 +14,7 @@ class AppRoutes {
   static const String createAccountScreen = '/create_account_screen';
   static const String registerYourVehicleScreen = '/register_your_vehicle_screen';
   static const String mapPage = '/Map_page';
+  static const String confirmedParkedStatus = '/confirmed_parked_status';
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -21,6 +23,7 @@ class AppRoutes {
     passwordScreen: (context) => PasswordScreen(),
     createAccountScreen: (context) => CreateAccountScreen(),
     registerYourVehicleScreen: (context) => RegisterYourVehicleScreen(),
-    mapPage: (context) => MapPage()
+    mapPage: (context) => MapPage(),
+    confirmedParkedStatus: (context) => ConfirmedParkedStatus()
   };
 }

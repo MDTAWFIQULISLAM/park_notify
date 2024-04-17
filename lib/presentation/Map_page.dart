@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:park_notify/routes/app_routes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -54,7 +55,6 @@ class _MapPageState extends State<MapPage> {
       }
     }
   }
-
   void _showParkedPopup() {
     showDialog(
       context: context,
@@ -69,6 +69,8 @@ class _MapPageState extends State<MapPage> {
                 setState(() {
                   _isParked = true;
                 });
+                // Navigate to ConfirmedParkedStatus page
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
               },
               child: Text("Yes"),
             ),
@@ -83,6 +85,8 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +113,7 @@ class _MapPageState extends State<MapPage> {
             top: MediaQuery.of(context).padding.top + 5.0,
             left: 20.0,
             child: Image.asset(
-              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
+              'assets/icon/icon.png', // Change this to your app logo asset path
               width: 40,
               height: 40,
             ),

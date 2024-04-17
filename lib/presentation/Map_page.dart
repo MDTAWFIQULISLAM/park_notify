@@ -95,7 +95,7 @@ class _MapPageState extends State<MapPage> {
                 ? CameraPosition(
               target: LatLng(_currentPosition!.latitude,
                   _currentPosition!.longitude),
-              zoom: 14,
+              zoom: 2,
             )
                 : CameraPosition(
               target: LatLng(0, 0),
@@ -109,7 +109,7 @@ class _MapPageState extends State<MapPage> {
             top: MediaQuery.of(context).padding.top + 5.0,
             left: 20.0,
             child: Image.asset(
-              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
+              'assets/icon/icon.png', // Change this to your app logo asset path
               width: 40,
               height: 40,
             ),

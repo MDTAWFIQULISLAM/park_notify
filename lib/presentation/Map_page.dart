@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:park_notify/routes/app_routes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -54,7 +55,6 @@ class _MapPageState extends State<MapPage> {
       }
     }
   }
-
   void _showParkedPopup() {
     showDialog(
       context: context,
@@ -69,6 +69,8 @@ class _MapPageState extends State<MapPage> {
                 setState(() {
                   _isParked = true;
                 });
+                // Navigate to ConfirmedParkedStatus page
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
               },
               child: Text("Yes"),
             ),
@@ -84,6 +86,8 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +99,7 @@ class _MapPageState extends State<MapPage> {
                 ? CameraPosition(
               target: LatLng(_currentPosition!.latitude,
                   _currentPosition!.longitude),
-              zoom: 2,
+              zoom: 14,
             )
                 : CameraPosition(
               target: LatLng(0, 0),

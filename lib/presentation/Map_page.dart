@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:park_notify/routes/app_routes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -14,12 +15,13 @@ class _MapPageState extends State<MapPage> {
   late GoogleMapController _mapController;
   TextEditingController searchController = TextEditingController();
   Position? _currentPosition;
-  Set<Marker> _markers = {};
+  bool _isParked = false;
 
   @override
   void initState() {
     super.initState();
     _getUserLocation();
+    _checkIfParked(); // Check if user is parked when page initializes
   }
 
   Future<void> _getUserLocation() async {
@@ -28,21 +30,63 @@ class _MapPageState extends State<MapPage> {
           desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _currentPosition = position;
-        _markers.add(
-          Marker(
-            markerId: MarkerId("current_location"),
-            position: LatLng(position.latitude, position.longitude),
-            infoWindow: InfoWindow(
-              title: "Current Location",
-              snippet: "You are here",
-            ),
-          ),
-        );
       });
     } catch (e) {
       print("Error: $e");
     }
   }
+
+  Future<void> _checkIfParked() async {
+    // Continuously check if the user is moving
+    while (true) {
+      await Future.delayed(Duration(seconds: 10)); // Check every 10 seconds
+      if (_currentPosition != null) {
+        // Get the user's current position
+        Position currentPosition = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        // Compare with the previous position to check movement
+        if (_currentPosition!.latitude == currentPosition.latitude &&
+            _currentPosition!.longitude == currentPosition.longitude) {
+          // If user is not moving, show popup
+          _showParkedPopup();
+          break;
+        }
+        _currentPosition = currentPosition;
+      }
+    }
+  }
+  void _showParkedPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Are you parked?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Set user as parked
+                setState(() {
+                  _isParked = true;
+                });
+                // Navigate to ConfirmedParkedStatus page
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
+              },
+              child: Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +105,39 @@ class _MapPageState extends State<MapPage> {
               target: LatLng(0, 0),
               zoom: 14,
             ),
-            markers: _markers,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
             // Add more map options as needed
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 5.0,
+            left: 20.0,
+            child: Image.asset(
+              'assets/icon/icon.png', // Change this to your app logo asset path
+              width: 40,
+              height: 40,
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 0.0,
+            right: 20.0,
+            child: Column(
+              children: [
+                SizedBox(height: 0), // Add space for logo
+                IconButton(
+                  icon: Icon(Icons.zoom_in),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomIn());
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.zoom_out),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomOut());
+                  },
+                ),
+              ],
+            ),
           ),
           Positioned(
             bottom: 20,

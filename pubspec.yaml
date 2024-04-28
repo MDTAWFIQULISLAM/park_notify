@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  http: ^0.13.3
   flutter_typeahead: ^3.0.0
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
@@ -42,6 +43,7 @@ flutter_launcher_icons:
 
 flutter:
   assets:
+    - assets/icon/icon.png
     - assets/images/
     - assets/images/get_started.png
     - assets/images/img_google.svg

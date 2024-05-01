@@ -47,6 +47,7 @@ flutter:
     - assets/images/get_started.png
     - assets/images/img_google.svg
     - assets/images/img_image_1.png
+    - assets/icon/marker.png
 
   uses-material-design: true
 

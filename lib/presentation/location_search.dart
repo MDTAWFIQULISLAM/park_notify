@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SearchPage extends StatefulWidget {
   @override
@@ -14,26 +12,26 @@ class _SearchPageState extends State<SearchPage> {
   void _fetchSuggestions(String input) {
     // Hard-coded list of suggestions for testing
     List<String> hardcodedSuggestions = [
-      'New York',
-      'Los Angeles',
-      'Chicago',
-      'Houston',
-      'Phoenix',
-      'Philadelphia',
-      'San Antonio',
-      'San Diego',
-      'Dallas',
-      'San Jose',
-      'Austin',
-      'Jacksonville',
-      'San Francisco',
-      'Indianapolis',
-      'Columbus',
-      'Fort Worth',
-      'Charlotte',
-      'Seattle',
-      'Denver',
-      'Washington'
+      'London',
+      'Manchester',
+      'Birmingham',
+      'Glasgow',
+      'Liverpool',
+      'Leeds',
+      'Bristol',
+      'Sheffield',
+      'Edinburgh',
+      'Cardiff',
+      'Belfast',
+      'Newcastle upon Tyne',
+      'Brighton',
+      'Leicester',
+      'Nottingham',
+      'Coventry',
+      'Reading',
+      'Bournemouth',
+      'Southampton',
+      'Aberdeen'
     ];
 
     setState(() {

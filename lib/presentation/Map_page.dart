@@ -1,49 +1,45 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart';
-import 'package:csv/csv.dart';
-
-
 import 'package:park_notify/routes/app_routes.dart';
+
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
 
+
   @override
   _MapPageState createState() => _MapPageState();
 }
+
 
 class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
   TextEditingController _searchController = TextEditingController();
   late LatLng sourceLocation;
   Position? lastPosition;
-  Timer? locationTimer;
 
-  List<LatLng> parkingLocations = [];
+
+  static const LatLng parkingLocation1 = LatLng(51.543350, -0.028030);
+  static const LatLng parkingLocation2 = LatLng(51.549720, -0.041210);
+  static const LatLng parkingLocation3 = LatLng(51.541557, -0.000093);
+
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-    // Start checking for location change after 5 minutes
-    locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-      _checkLocationChange();
-    });
-
-    // Load parking locations from CSV
-    _loadParkingLocations();
   }
+
 
   @override
   void dispose() {
-    locationTimer?.cancel();
     super.dispose();
   }
+
 
   Future<void> _getCurrentLocation() async {
     try {
@@ -57,66 +53,12 @@ class _MapPageState extends State<MapPage> {
       print("Error getting current location: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Error getting current location. Please check your location settings.'),
+          content: Text('Error getting current location. Please check your location settings.'),
         ),
       );
     }
   }
 
-  Future<void> _checkLocationChange() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      if (lastPosition != null &&
-          (position.latitude != lastPosition!.latitude ||
-              position.longitude != lastPosition!.longitude)) {
-        // Update last known position
-        setState(() {
-          lastPosition = position;
-        });
-      } else {
-        // Delay showing the dialog by 10 seconds
-        Future.delayed(Duration(seconds: 10), () {
-          if (lastPosition != null &&
-              (position.latitude != lastPosition!.latitude ||
-                  position.longitude != lastPosition!.longitude)) {
-            // User hasn't moved, prompt "Are you parked?" dialog
-            _showAreYouParkedDialog();
-          }
-        });
-      }
-    } catch (e) {
-      print("Error checking location change: $e");
-    }
-  }
-
-  void _showAreYouParkedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Are you parked?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Handle 'Yes' action
-              },
-            ),
-            TextButton(
-              child: Text("No"),
-              onPressed: () {
-                Navigator.pushNamed(
-                    context, AppRoutes.confirmedParkedStatus);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,30 +67,38 @@ class _MapPageState extends State<MapPage> {
         children: [
           if (sourceLocation != null)
             GoogleMap(
-              initialCameraPosition: CameraPosition(
-                  target: sourceLocation, zoom: 13),
+              initialCameraPosition: CameraPosition(target: sourceLocation, zoom: 13),
               markers: {
                 Marker(
                   markerId: MarkerId("source"),
                   position: sourceLocation,
                 ),
-                for (int i = 0; i < parkingLocations.length; i++)
-                  Marker(
-                    markerId: MarkerId("parkingLocation$i"),
-                    position: parkingLocations[i],
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueAzure),
-                  ),
+                Marker(
+                  markerId: MarkerId("destination1"),
+                  position: parkingLocation1,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
+                Marker(
+                  markerId: MarkerId("destination2"),
+                  position: parkingLocation2,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
+                Marker(
+                  markerId: MarkerId("destination3"),
+                  position: parkingLocation3,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
               },
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
             ),
+          if (sourceLocation == null) // Show a loading indicator until location is fetched
+            Center(
+              child: CircularProgressIndicator(),
+            ),
           Positioned(
-            top: MediaQuery
-                .of(context)
-                .padding
-                .top + 5.0,
+            top: MediaQuery.of(context).padding.top + 5.0,
             left: 20.0,
             child: Image.asset(
               'assets/icon/icon.png', // Change this to your app logo asset path
@@ -157,10 +107,7 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           Positioned(
-            top: MediaQuery
-                .of(context)
-                .padding
-                .top + 5.0,
+            top: MediaQuery.of(context).padding.top + 5.0,
             right: 20.0,
             child: Container(
               decoration: BoxDecoration(
@@ -168,19 +115,19 @@ class _MapPageState extends State<MapPage> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withOpacity(0.3), // Soft shadow color
                     spreadRadius: 2,
                     blurRadius: 4,
-                    offset: Offset(0, 2),
+                    offset: Offset(0, 2), // Adjust the position of the shadow
                   ),
                 ],
               ),
-              padding: EdgeInsets.all(0.1),
+              padding: EdgeInsets.all(0.1), // Adjust padding as needed
               child: IconButton(
-                iconSize: 20.0,
+                iconSize: 20.0, // Decrease the size of the icon
                 icon: Icon(Icons.my_location),
                 onPressed: _goToCurrentLocation,
-                color: Colors.blueAccent,
+                color: Colors.blueAccent, // Adjust icon color as needed
               ),
             ),
           ),
@@ -192,8 +139,7 @@ class _MapPageState extends State<MapPage> {
               borderRadius: BorderRadius.circular(30.0),
               child: Container(
                 color: Colors.white,
-                padding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   children: [
                     Expanded(
@@ -222,14 +168,15 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+
   Future<void> _searchLocation(String query) async {
     try {
       List<Location> locations = await locationFromAddress(query);
       if (locations.isNotEmpty) {
-        final LatLng latLng = LatLng(
-            locations.first.latitude!, locations.first.longitude!);
+        final LatLng latLng = LatLng(locations.first.latitude!, locations.first.longitude!);
         final GoogleMapController controller = await _controller.future;
         controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+        // You may add a marker here to show the searched location
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -246,25 +193,13 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+
   Future<void> _goToCurrentLocation() async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation, 14));
   }
-
-  Future<void> _loadParkingLocations() async {
-    final String csvString = await rootBundle.loadString(
-        'assets/locations/Parking_Locations.csv');
-    final List<List<dynamic>> csvData = CsvToListConverter().convert(csvString);
-
-    for (final row in csvData) {
-      final double latitude = double.parse(row[0].toString());
-      final double longitude = double.parse(row[1].toString());
-      parkingLocations.add(LatLng(latitude, longitude));
-    }
-
-    setState(() {});
-  }
 }
+
 
 void main() {
   runApp(MaterialApp(

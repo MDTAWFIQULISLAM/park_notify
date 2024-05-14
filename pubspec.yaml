@@ -17,7 +17,7 @@ dependencies:
   flutter_svg: ^2.0.9
   country_pickers: ^2.0.0
   intl: ^0.19.0
-
+  csv: ^6.0.0
   cupertino_icons: ^1.0.6
   flutter_native_splash: ^2.3.13
   google_maps_flutter: ^2.2.8
@@ -25,6 +25,9 @@ dependencies:
   geocoding: ^3.0.0
   geolocator: ^11.0.0
   flutter_google_places: ^0.3.0
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -47,6 +50,8 @@ flutter:
     - assets/images/get_started.png
     - assets/images/img_google.svg
     - assets/images/img_image_1.png
+    - assets/icon/marker.png
+    - assets/locations/Parking_Locations.csv
 
   uses-material-design: true
 

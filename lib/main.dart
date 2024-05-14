@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/scheduler.dart';
 import 'core/app_export.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'Park Notify',
           debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.confirmedParkedStatus,
+          initialRoute: AppRoutes.getStartedScreen,
           routes: AppRoutes.routes,
         );
       },

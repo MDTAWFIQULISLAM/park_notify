@@ -45,6 +45,12 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       _isSearchBarOpen = false;
     });
+    // Reset padding back to 20 after keyboard is dismissed
+    Future.delayed(Duration(milliseconds: 100), () {
+      setState(() {
+        _isSearchBarOpen ? 20.0 : MediaQuery.of(context).size.height - 390;
+      });
+    });
   }
 
   Future<void> _getUserLocation() async {
@@ -124,7 +130,7 @@ class _MapPageState extends State<MapPage> {
             myLocationButtonEnabled: false,
           ),
           AnimatedPositioned(
-            duration: Duration(milliseconds: 1000),
+            duration: Duration(milliseconds: 500),
             bottom: _isSearchBarOpen ? MediaQuery.of(context).size.height - 390 : 20.0,
             left: 16.0,
             right: 16.0,

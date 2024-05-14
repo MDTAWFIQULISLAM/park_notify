@@ -15,12 +15,36 @@ class _MapPageState extends State<MapPage> {
   TextEditingController searchController = TextEditingController();
   Position? _currentPosition;
   bool _isParked = false;
+  bool _isSearchBarOpen = false;
+  FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _getUserLocation();
     _checkIfParked(); // Check if user is parked when page initializes
+
+    _focusNode.addListener(() {
+      setState(() {
+        _isSearchBarOpen = _focusNode.hasFocus;
+        if (!_isSearchBarOpen) {
+          // Reset the position when keyboard is closed
+          _resetSearchBarPosition();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _resetSearchBarPosition() {
+    setState(() {
+      _isSearchBarOpen = false;
+    });
   }
 
   Future<void> _getUserLocation() async {
@@ -36,17 +60,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _checkIfParked() async {
-    // Continuously check if the user is moving
     while (true) {
-      await Future.delayed(Duration(seconds: 10)); // Check every 10 seconds
+      await Future.delayed(Duration(seconds: 10));
       if (_currentPosition != null) {
-        // Get the user's current position
         Position currentPosition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high);
-        // Compare with the previous position to check movement
         if (_currentPosition!.latitude == currentPosition.latitude &&
             _currentPosition!.longitude == currentPosition.longitude) {
-          // If user is not moving, show popup
           _showParkedPopup();
           break;
         }
@@ -65,7 +85,6 @@ class _MapPageState extends State<MapPage> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Set user as parked
                 setState(() {
                   _isParked = true;
                 });
@@ -103,40 +122,10 @@ class _MapPageState extends State<MapPage> {
             ),
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
-            // Add more map options as needed
           ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 5.0,
-            left: 20.0,
-            child: Image.asset(
-              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
-              width: 40,
-              height: 40,
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 0.0,
-            right: 20.0,
-            child: Column(
-              children: [
-                SizedBox(height: 0), // Add space for logo
-                IconButton(
-                  icon: Icon(Icons.zoom_in),
-                  onPressed: () {
-                    _mapController.animateCamera(CameraUpdate.zoomIn());
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.zoom_out),
-                  onPressed: () {
-                    _mapController.animateCamera(CameraUpdate.zoomOut());
-                  },
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 20,
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 1000),
+            bottom: _isSearchBarOpen ? MediaQuery.of(context).size.height - 390 : 20.0,
             left: 16.0,
             right: 16.0,
             child: ClipRRect(
@@ -149,6 +138,12 @@ class _MapPageState extends State<MapPage> {
                   children: [
                     Expanded(
                       child: TextField(
+                        onTap: () {
+                          setState(() {
+                            _isSearchBarOpen = true;
+                          });
+                        },
+                        focusNode: _focusNode,
                         controller: searchController,
                         decoration: InputDecoration(
                           hintText: 'Search Address or Postcode',
@@ -165,6 +160,36 @@ class _MapPageState extends State<MapPage> {
                   ],
                 ),
               ),
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 5.0,
+            left: 20.0,
+            child: Image.asset(
+              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
+              width: 40,
+              height: 40,
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 0.0,
+            right: 20.0,
+            child: Column(
+              children: [
+                SizedBox(height: 0),
+                IconButton(
+                  icon: Icon(Icons.zoom_in),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomIn());
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.zoom_out),
+                  onPressed: () {
+                    _mapController.animateCamera(CameraUpdate.zoomOut());
+                  },
+                ),
+              ],
             ),
           ),
         ],

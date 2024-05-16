@@ -19,7 +19,6 @@ class _MapPageState extends State<MapPage> {
   TextEditingController _searchController = TextEditingController();
   LatLng? sourceLocation;
   Position? lastPosition;
-  Timer? locationTimer;
 
   List<LatLng> parkingLocations = [];
   bool isLoading = true;
@@ -28,15 +27,11 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     _checkPermissionsAndGetLocation();
-    locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
-      _checkLocationChange();
-    });
     _loadParkingLocations();
   }
 
   @override
   void dispose() {
-    locationTimer?.cancel();
     super.dispose();
   }
 
@@ -100,57 +95,6 @@ class _MapPageState extends State<MapPage> {
         ),
       );
     }
-  }
-
-  Future<void> _checkLocationChange() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      if (lastPosition != null &&
-          (position.latitude != lastPosition!.latitude ||
-              position.longitude != lastPosition!.longitude)) {
-        setState(() {
-          lastPosition = position;
-        });
-      } else {
-        Future.delayed(Duration(seconds: 10), () {
-          if (lastPosition != null &&
-              (position.latitude != lastPosition!.latitude ||
-                  position.longitude != lastPosition!.longitude)) {
-            _showAreYouParkedDialog();
-          }
-        });
-      }
-    } catch (e) {
-      print("Error checking location change: $e");
-    }
-  }
-
-  void _showAreYouParkedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Are you parked?"),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Handle 'Yes' action
-              },
-            ),
-            TextButton(
-              child: Text("No"),
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> _loadParkingLocations() async {

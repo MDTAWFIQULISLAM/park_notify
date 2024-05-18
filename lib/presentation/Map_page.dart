@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
+import 'package:csv/csv.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -11,97 +14,140 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late GoogleMapController _mapController;
-  TextEditingController searchController = TextEditingController();
-  Position? _currentPosition;
-  bool _isParked = false;
-  bool _isSearchBarOpen = false;
-  FocusNode _focusNode = FocusNode();
+  final Completer<GoogleMapController> _controller = Completer();
+  TextEditingController _searchController = TextEditingController();
+  LatLng? sourceLocation;
+  Position? lastPosition;
+  Timer? locationTimer;
+
+  List<LatLng> parkingLocations = [];
+  bool isLoading = true;
+
+  Uint8List? markerIcon;
 
   @override
   void initState() {
     super.initState();
-    _getUserLocation();
-    _checkIfParked(); // Check if user is parked when page initializes
-
-    _focusNode.addListener(() {
-      setState(() {
-        _isSearchBarOpen = _focusNode.hasFocus;
-        if (!_isSearchBarOpen) {
-          // Reset the position when keyboard is closed
-          _resetSearchBarPosition();
-        }
-      });
+    _checkPermissionsAndGetLocation();
+    locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      _checkLocationChange();
     });
+    _loadParkingLocations();
+    _loadMarkerIcon();
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    locationTimer?.cancel();
     super.dispose();
   }
 
-  void _resetSearchBarPosition() {
-    setState(() {
-      _isSearchBarOpen = false;
-    });
-    // Reset padding back to 20 after keyboard is dismissed
-    Future.delayed(Duration(milliseconds: 100), () {
-      setState(() {
-        _isSearchBarOpen ? 20.0 : MediaQuery.of(context).size.height - 390;
-      });
-    });
-  }
+  Future<void> _checkPermissionsAndGetLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  Future<void> _getUserLocation() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentPosition = position;
-      });
-    } catch (e) {
-      print("Error: $e");
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Location services are disabled. Please enable the services'),
+        ),
+      );
+      return;
     }
-  }
 
-  Future<void> _checkIfParked() async {
-    while (true) {
-      await Future.delayed(Duration(seconds: 10));
-      if (_currentPosition != null) {
-        Position currentPosition = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high);
-        if (_currentPosition!.latitude == currentPosition.latitude &&
-            _currentPosition!.longitude == currentPosition.longitude) {
-          _showParkedPopup();
-          break;
-        }
-        _currentPosition = currentPosition;
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Location permissions are denied'),
+          ),
+        );
+        return;
       }
     }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Location permissions are permanently denied, we cannot request permissions.'),
+        ),
+      );
+      return;
+    }
+
+    _getCurrentLocation();
   }
 
-  void _showParkedPopup() {
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        sourceLocation = LatLng(position.latitude, position.longitude);
+        lastPosition = position;
+      });
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation!, 2));
+    } catch (e) {
+      print("Error getting current location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error getting current location. Please check your location settings.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _checkLocationChange() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (lastPosition != null &&
+          (position.latitude != lastPosition!.latitude ||
+              position.longitude != lastPosition!.longitude)) {
+        setState(() {
+          lastPosition = position;
+        });
+      } else {
+        Future.delayed(Duration(seconds: 10), () {
+          if (lastPosition != null &&
+              (position.latitude != lastPosition!.latitude ||
+                  position.longitude != lastPosition!.longitude)) {
+            _showAreYouParkedDialog();
+          }
+        });
+      }
+    } catch (e) {
+      print("Error checking location change: $e");
+    }
+  }
+
+  void _showAreYouParkedDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Are you parked?"),
-          actions: [
+          actions: <Widget>[
             TextButton(
+              child: Text("Yes"),
               onPressed: () {
                 Navigator.of(context).pop();
-                setState(() {
-                  _isParked = true;
-                });
+                // Handle 'Yes' action
               },
-              child: Text("Yes"),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
               child: Text("No"),
+              onPressed: () {
+                // Navigate to another screen or perform action
+              },
             ),
           ],
         );
@@ -109,119 +155,82 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _loadParkingLocations() async {
+    try {
+      final String csvString = await rootBundle.loadString('assets/locations/Parking_Locations.csv');
+      final List<List<dynamic>> csvData = CsvToListConverter().convert(csvString, eol: "\n");
+
+      List<LatLng> locations = [];
+      for (final row in csvData.skip(1)) {  // Skip header row
+        try {
+          final double latitude = double.parse(row[2].toString());
+          final double longitude = double.parse(row[3].toString());
+          locations.add(LatLng(latitude, longitude));
+        } catch (e) {
+          print("Error parsing row: $row, Error: $e");
+        }
+      }
+
+      setState(() {
+        parkingLocations = locations;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error loading CSV: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading parking locations.'),
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMarkerIcon() async {
+    final ByteData byteData =
+    await rootBundle.load('assets/images/pn_logo.png');
+    markerIcon = byteData.buffer.asUint8List();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: _currentPosition != null
-                ? CameraPosition(
-              target: LatLng(_currentPosition!.latitude,
-                  _currentPosition!.longitude),
-              zoom: 14,
-            )
-                : CameraPosition(
-              target: LatLng(0, 0),
-              zoom: 14,
-            ),
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-          ),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 500),
-            bottom: _isSearchBarOpen ? MediaQuery.of(context).size.height - 390 : 20.0,
-            left: 16.0,
-            right: 16.0,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: Container(
-                color: Colors.white,
-                padding:
-                EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        onTap: () {
-                          setState(() {
-                            _isSearchBarOpen = true;
-                          });
-                        },
-                        focusNode: _focusNode,
-                        controller: searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search Address or Postcode',
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        _searchLocation(searchController.text);
-                      },
-                    ),
-                  ],
-                ),
+          if (sourceLocation != null)
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: sourceLocation!,
+                zoom: 13,
               ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 5.0,
-            left: 20.0,
-            child: Image.asset(
-              '/Users/tanvirakhtershakib/StudioProjects/park_notify/assets/icon/icon.png', // Change this to your app logo asset path
-              width: 40,
-              height: 40,
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 0.0,
-            right: 20.0,
-            child: Column(
-              children: [
-                SizedBox(height: 0),
-                IconButton(
-                  icon: Icon(Icons.zoom_in),
-                  onPressed: () {
-                    _mapController.animateCamera(CameraUpdate.zoomIn());
-                  },
+              markers: {
+                Marker(
+                  markerId: MarkerId("source"),
+                  position: sourceLocation!,
                 ),
-                IconButton(
-                  icon: Icon(Icons.zoom_out),
-                  onPressed: () {
-                    _mapController.animateCamera(CameraUpdate.zoomOut());
-                  },
-                ),
-              ],
-            ),
-          ),
+                for (int i = 0; i < parkingLocations.length; i++)
+                  Marker(
+                    markerId: MarkerId("parkingLocation$i"),
+                    position: parkingLocations[i],
+                    icon: markerIcon != null
+                        ? BitmapDescriptor.fromBytes(markerIcon!)
+                        : BitmapDescriptor.defaultMarker,
+                  ),
+              },
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+            )
+          else
+            Center(child: CircularProgressIndicator()),
+          if (isLoading)
+            Center(child: CircularProgressIndicator()),
         ],
       ),
     );
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      _mapController = controller;
-    });
-  }
-
-  Future<void> _searchLocation(String query) async {
-    List<Location> locations = await locationFromAddress(query);
-    if (locations.isNotEmpty) {
-      final LatLng latLng = LatLng(locations.first.latitude!,
-          locations.first.longitude!);
-      _mapController.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Location not found'),
-        ),
-      );
-    }
   }
 }
 

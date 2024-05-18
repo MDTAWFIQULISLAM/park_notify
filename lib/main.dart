@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'Park Notify',
           debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.getStartedScreen,
+          initialRoute: AppRoutes.mapPage,
           routes: AppRoutes.routes,
         );
       },

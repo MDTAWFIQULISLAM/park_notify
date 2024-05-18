@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/core/app_export.dart';
 
-class ConfirmedParkedStatus extends StatelessWidget {
+class PaymentCompleted extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,14 +15,14 @@ class ConfirmedParkedStatus extends StatelessWidget {
             CheckmarkLogo(size: 100.adaptSize),
             SizedBox(height: 38.v),
             Text(
-              "Parking Completed",
+              "Payment Completed!",
               style: theme.textTheme.headlineMedium,
             ),
             SizedBox(height: 39.v),
             CustomElevatedButton(
-              text: "Pay Now",
+              text: "Set Custom Reminder",
               onPressed: () {
-                _onTapPaymentCompleted(context);
+                _onTapSetReminder(context);
               },
               buttonTextStyle: CustomTextStyles.titleMediumOxygenWhiteA700,
             ),
@@ -78,6 +78,6 @@ class _CheckmarkPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-void _onTapPaymentCompleted(BuildContext context) {
-  Navigator.pushNamed(context, AppRoutes.paymentCompleted);
+void _onTapSetReminder(BuildContext context) {
+  Navigator.pushNamed(context, AppRoutes.setReminderPage);
 }

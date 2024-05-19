@@ -24,6 +24,8 @@ class _MapPageState extends State<MapPage> {
   List<LatLng> parkingLocations = [];
   bool isLoading = true;
 
+  Uint8List? markerIcon;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +34,7 @@ class _MapPageState extends State<MapPage> {
       _checkLocationChange();
     });
     _loadParkingLocations();
+    _loadMarkerIcon();
   }
 
   @override
@@ -89,7 +92,7 @@ class _MapPageState extends State<MapPage> {
         lastPosition = position;
       });
       final GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation!, 2));
+      controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation!, 14));
     } catch (e) {
       print("Error getting current location: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,6 +189,13 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  Future<void> _loadMarkerIcon() async {
+    final ByteData byteData =
+    await rootBundle.load('assets/images/pn_logo.png');
+    markerIcon = byteData.buffer.asUint8List();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,9 +216,9 @@ class _MapPageState extends State<MapPage> {
                   Marker(
                     markerId: MarkerId("parkingLocation$i"),
                     position: parkingLocations[i],
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueAzure,
-                    ),
+                    icon: markerIcon != null
+                        ? BitmapDescriptor.fromBytes(markerIcon!)
+                        : BitmapDescriptor.defaultMarker,
                   ),
               },
               onMapCreated: (GoogleMapController controller) {

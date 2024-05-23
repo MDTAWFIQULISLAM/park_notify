@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:math' show cos, sqrt, asin;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
@@ -20,16 +21,19 @@ class _MapPageState extends State<MapPage> {
   late LatLng sourceLocation;
   Position? lastPosition;
   Timer? locationTimer;
+  bool _hasShownParkingDialog = false; // Add this flag
 
   static const LatLng parkingLocation1 = LatLng(51.543350, -0.028030);
   static const LatLng parkingLocation2 = LatLng(51.549720, -0.041210);
   static const LatLng parkingLocation3 = LatLng(51.541557, -0.000093);
 
+  static const double proximityThreshold = 0.4; // Define a threshold for proximity checking
+
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-    // Start checking for location change after 5 minutes
+    // Start checking for location change every 10 seconds
     locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       _checkLocationChange();
     });
@@ -59,6 +63,27 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  bool _isNearParkingLocation(Position position) {
+    final LatLng currentLatLng = LatLng(position.latitude, position.longitude);
+    return _calculateDistance(currentLatLng, parkingLocation1) <= proximityThreshold ||
+        _calculateDistance(currentLatLng, parkingLocation2) <= proximityThreshold ||
+        _calculateDistance(currentLatLng, parkingLocation3) <= proximityThreshold;
+  }
+
+  double _calculateDistance(LatLng start, LatLng end) {
+    final double lat1 = start.latitude;
+    final double lon1 = start.longitude;
+    final double lat2 = end.latitude;
+    final double lon2 = end.longitude;
+    const double p = 0.017453292519943295;
+    final double a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) *
+            cos(lat2 * p) *
+            (1 - cos((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
   Future<void> _checkLocationChange() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -69,14 +94,13 @@ class _MapPageState extends State<MapPage> {
         // Update last known position
         setState(() {
           lastPosition = position;
+          _hasShownParkingDialog = false; // Reset the flag when the position changes
         });
       } else {
         // Delay showing the dialog by 10 seconds
         Future.delayed(Duration(seconds: 10), () {
-          if (lastPosition != null &&
-              (position.latitude != lastPosition!.latitude ||
-                  position.longitude != lastPosition!.longitude)) {
-            // User hasn't moved, prompt "Are you parked?" dialog
+          if (_isNearParkingLocation(position) && !_hasShownParkingDialog) {
+            // User hasn't moved and is near a parking location, prompt "Are you parked?" dialog
             _showAreYouParkedDialog();
           }
         });
@@ -87,6 +111,9 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _showAreYouParkedDialog() {
+    setState(() {
+      _hasShownParkingDialog = true; // Set the flag when the dialog is shown
+    });
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -96,14 +123,15 @@ class _MapPageState extends State<MapPage> {
             TextButton(
               child: Text("Yes"),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
+
                 // Handle 'Yes' action
               },
             ),
             TextButton(
               child: Text("No"),
               onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -150,7 +178,6 @@ class _MapPageState extends State<MapPage> {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.zoomOut());
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

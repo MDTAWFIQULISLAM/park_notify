@@ -6,9 +6,6 @@ import 'package:park_notify/presentation/create_account_screen.dart';
 import 'package:park_notify/presentation/register_your_vehicle_screen.dart';
 import 'package:park_notify/presentation/Map_page.dart';
 import 'package:park_notify/presentation/confirmed_parked_status.dart';
-import 'package:park_notify/presentation/location_search.dart';
-import 'package:park_notify/presentation/payment_completed.dart';
-import 'package:park_notify/presentation/set_reminder_page.dart';
 
 class AppRoutes {
   static const String getStartedScreen = '/get_started_screen';
@@ -18,9 +15,6 @@ class AppRoutes {
   static const String registerYourVehicleScreen = '/register_your_vehicle_screen';
   static const String mapPage = '/Map_page';
   static const String confirmedParkedStatus = '/confirmed_parked_status';
-  static const String searchPage = '/location_search';
-  static const String paymentCompleted = '/payment_completed';
-  static const String setReminderPage = '/set_reminder_page';
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -30,9 +24,6 @@ class AppRoutes {
     createAccountScreen: (context) => CreateAccountScreen(),
     registerYourVehicleScreen: (context) => RegisterYourVehicleScreen(),
     mapPage: (context) => MapPage(),
-    confirmedParkedStatus: (context) => ConfirmedParkedStatus(),
-    searchPage: (context) => SearchPage(),
-    paymentCompleted: (context) => PaymentCompleted(),
-    setReminderPage: (context) => SetReminderPage(),
+    confirmedParkedStatus: (context) => ConfirmedParkedStatus()
   };
 }

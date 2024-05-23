@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter/services.dart';
-import 'package:csv/csv.dart';
+
+import 'package:park_notify/routes/app_routes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -16,24 +17,22 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller = Completer();
   TextEditingController _searchController = TextEditingController();
-  LatLng? sourceLocation;
+  late LatLng sourceLocation;
   Position? lastPosition;
   Timer? locationTimer;
 
-  List<LatLng> parkingLocations = [];
-  bool isLoading = true;
-
-  Uint8List? markerIcon;
+  static const LatLng parkingLocation1 = LatLng(51.543350, -0.028030);
+  static const LatLng parkingLocation2 = LatLng(51.549720, -0.041210);
+  static const LatLng parkingLocation3 = LatLng(51.541557, -0.000093);
 
   @override
   void initState() {
     super.initState();
-    _checkPermissionsAndGetLocation();
+    _getCurrentLocation();
+    // Start checking for location change after 5 minutes
     locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       _checkLocationChange();
     });
-    _loadParkingLocations();
-    _loadMarkerIcon();
   }
 
   @override
@@ -42,63 +41,19 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  Future<void> _checkPermissionsAndGetLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Location services are disabled. Please enable the services'),
-        ),
-      );
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Location permissions are denied'),
-          ),
-        );
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Location permissions are permanently denied, we cannot request permissions.'),
-        ),
-      );
-      return;
-    }
-
-    _getCurrentLocation();
-  }
-
   Future<void> _getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+          desiredAccuracy: LocationAccuracy.high);
       setState(() {
         sourceLocation = LatLng(position.latitude, position.longitude);
         lastPosition = position;
       });
-      final GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation!, 2));
     } catch (e) {
       print("Error getting current location: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Error getting current location. Please check your location settings.',
-          ),
+          content: Text('Error getting current location. Please check your location settings.'),
         ),
       );
     }
@@ -107,19 +62,21 @@ class _MapPageState extends State<MapPage> {
   Future<void> _checkLocationChange() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+          desiredAccuracy: LocationAccuracy.high);
       if (lastPosition != null &&
           (position.latitude != lastPosition!.latitude ||
               position.longitude != lastPosition!.longitude)) {
+        // Update last known position
         setState(() {
           lastPosition = position;
         });
       } else {
+        // Delay showing the dialog by 10 seconds
         Future.delayed(Duration(seconds: 10), () {
           if (lastPosition != null &&
               (position.latitude != lastPosition!.latitude ||
                   position.longitude != lastPosition!.longitude)) {
+            // User hasn't moved, prompt "Are you parked?" dialog
             _showAreYouParkedDialog();
           }
         });
@@ -146,7 +103,7 @@ class _MapPageState extends State<MapPage> {
             TextButton(
               child: Text("No"),
               onPressed: () {
-                // Navigate to another screen or perform action
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
               },
             ),
           ],
@@ -155,44 +112,43 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> _loadParkingLocations() async {
+  Future<void> _searchLocation(String query) async {
     try {
-      final String csvString = await rootBundle.loadString('assets/locations/Parking_Locations.csv');
-      final List<List<dynamic>> csvData = CsvToListConverter().convert(csvString, eol: "\n");
-
-      List<LatLng> locations = [];
-      for (final row in csvData.skip(1)) {  // Skip header row
-        try {
-          final double latitude = double.parse(row[2].toString());
-          final double longitude = double.parse(row[3].toString());
-          locations.add(LatLng(latitude, longitude));
-        } catch (e) {
-          print("Error parsing row: $row, Error: $e");
-        }
+      List<Location> locations = await locationFromAddress(query);
+      if (locations.isNotEmpty) {
+        final LatLng latLng = LatLng(locations.first.latitude, locations.first.longitude);
+        final GoogleMapController controller = await _controller.future;
+        controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
+        // You may add a marker here to show the searched location
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Location not found'),
+          ),
+        );
       }
-
-      setState(() {
-        parkingLocations = locations;
-        isLoading = false;
-      });
     } catch (e) {
-      print("Error loading CSV: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error loading parking locations.'),
+          content: Text('Error searching for location: $e'),
         ),
       );
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
-  Future<void> _loadMarkerIcon() async {
-    final ByteData byteData =
-    await rootBundle.load('assets/images/pn_logo.png');
-    markerIcon = byteData.buffer.asUint8List();
-    setState(() {});
+  Future<void> _goToCurrentLocation() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation, 14));
+  }
+
+  Future<void> _zoomIn() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.zoomIn());
+  }
+
+  Future<void> _zoomOut() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.zoomOut());
   }
 
   @override
@@ -202,32 +158,120 @@ class _MapPageState extends State<MapPage> {
         children: [
           if (sourceLocation != null)
             GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: sourceLocation!,
-                zoom: 13,
-              ),
+              initialCameraPosition: CameraPosition(target: sourceLocation, zoom: 13),
               markers: {
+                Marker(markerId: MarkerId("source"), position: sourceLocation),
                 Marker(
-                  markerId: MarkerId("source"),
-                  position: sourceLocation!,
+                  markerId: MarkerId("destination1"),
+                  position: parkingLocation1,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
                 ),
-                for (int i = 0; i < parkingLocations.length; i++)
-                  Marker(
-                    markerId: MarkerId("parkingLocation$i"),
-                    position: parkingLocations[i],
-                    icon: markerIcon != null
-                        ? BitmapDescriptor.fromBytes(markerIcon!)
-                        : BitmapDescriptor.defaultMarker,
-                  ),
+                Marker(
+                  markerId: MarkerId("destination2"),
+                  position: parkingLocation2,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
+                Marker(
+                  markerId: MarkerId("destination3"),
+                  position: parkingLocation3,
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
               },
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
-            )
-          else
-            Center(child: CircularProgressIndicator()),
-          if (isLoading)
-            Center(child: CircularProgressIndicator()),
+              zoomControlsEnabled: false, // Disable the default zoom controls
+            ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 5.0,
+            left: 20.0,
+            child: Image.asset(
+              'assets/icon/icon.png', // Change this to your app logo asset path
+              width: 40,
+              height: 40,
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 5.0,
+            right: 20.0,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3), // Soft shadow color
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: Offset(0, 2), // Adjust the position of the shadow
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(0.1), // Adjust padding as needed
+              child: IconButton(
+                iconSize: 20.0, // Decrease the size of the icon
+                icon: Icon(Icons.my_location),
+                onPressed: _goToCurrentLocation,
+                color: Colors.blueAccent, // Adjust icon color as needed
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            left: 16.0,
+            right: 16.0,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30.0),
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Where to?',
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.search),
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        _searchLocation(_searchController.text);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Custom zoom controls
+          Positioned(
+            bottom: 90, // Adjust this value to position above the search bar
+            right: 16, // Adjust this value to align with the right of the search bar
+            child: Column(
+              children: [
+                FloatingActionButton(
+                  heroTag: "zoomIn",
+                  mini: true,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.zoom_in, color: Colors.black),
+                  onPressed: _zoomIn,
+                ),
+                SizedBox(height: 8),
+                FloatingActionButton(
+                  heroTag: "zoomOut",
+                  mini: true,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.zoom_out, color: Colors.black),
+                  onPressed: _zoomOut,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

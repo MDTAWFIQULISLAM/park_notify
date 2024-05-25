@@ -27,7 +27,7 @@ class _MapPageState extends State<MapPage> {
   static const LatLng parkingLocation2 = LatLng(51.549720, -0.041210);
   static const LatLng parkingLocation3 = LatLng(51.541557, -0.000093);
 
-  static const double proximityThreshold = 0.4; // Define a threshold for proximity checking
+  static const double proximityThreshold = 0.5; // Define a threshold for proximity checking
 
   @override
   void initState() {

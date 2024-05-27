@@ -22,6 +22,7 @@ class _MapPageState extends State<MapPage> {
   Timer? locationTimer;
 
   List<LatLng> parkingLocations = [];
+  List<LatLng> nearbyParkingLocations = [];
   bool isLoading = true;
 
   Uint8List? markerIcon;
@@ -90,6 +91,7 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         sourceLocation = LatLng(position.latitude, position.longitude);
         lastPosition = position;
+        _filterNearbyParkingLocations();
       });
       final GoogleMapController controller = await _controller.future;
       controller.animateCamera(CameraUpdate.newLatLngZoom(sourceLocation!, 14));
@@ -115,6 +117,7 @@ class _MapPageState extends State<MapPage> {
               position.longitude != lastPosition!.longitude)) {
         setState(() {
           lastPosition = position;
+          _filterNearbyParkingLocations();
         });
       } else {
         Future.delayed(Duration(seconds: 10), () {
@@ -174,6 +177,7 @@ class _MapPageState extends State<MapPage> {
 
       setState(() {
         parkingLocations = locations;
+        _filterNearbyParkingLocations();
         isLoading = false;
       });
     } catch (e) {
@@ -196,6 +200,26 @@ class _MapPageState extends State<MapPage> {
     setState(() {});
   }
 
+  void _filterNearbyParkingLocations() {
+    if (sourceLocation != null) {
+      setState(() {
+        nearbyParkingLocations = parkingLocations
+            .where((location) =>
+        _calculateDistance(sourceLocation!, location) <= 5.0)
+            .toList();
+      });
+    }
+  }
+
+  double _calculateDistance(LatLng start, LatLng end) {
+    return Geolocator.distanceBetween(
+      start.latitude,
+      start.longitude,
+      end.latitude,
+      end.longitude,
+    ) / 1000; // Convert to kilometers
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,10 +236,10 @@ class _MapPageState extends State<MapPage> {
                   markerId: MarkerId("source"),
                   position: sourceLocation!,
                 ),
-                for (int i = 0; i < parkingLocations.length; i++)
+                for (int i = 0; i < nearbyParkingLocations.length; i++)
                   Marker(
                     markerId: MarkerId("parkingLocation$i"),
-                    position: parkingLocations[i],
+                    position: nearbyParkingLocations[i],
                     icon: markerIcon != null
                         ? BitmapDescriptor.fromBytes(markerIcon!)
                         : BitmapDescriptor.defaultMarker,
@@ -308,6 +332,10 @@ class _MapPageState extends State<MapPage> {
           locations.first.latitude,
           locations.first.longitude,
         );
+        setState(() {
+          sourceLocation = latLng;
+          _filterNearbyParkingLocations();
+        });
         final GoogleMapController controller = await _controller.future;
         controller.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
       } else {

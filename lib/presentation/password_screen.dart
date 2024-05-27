@@ -13,15 +13,12 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreenState extends State<PasswordScreen> {
   TextEditingController passwordController = TextEditingController();
-
   bool rememberMe = false;
-
+  bool _obscurePassword = true; // Initially obscure the password
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    bool _obscurePassword = true; // Initially obscure the password
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -35,7 +32,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               children: [
                 Text("You are almost there..", style: theme.textTheme.headlineSmall),
                 SizedBox(height: 57.v),
-                _buildPasswordTextField(context, _obscurePassword),
+                _buildPasswordTextField(context),
                 SizedBox(height: 28.v),
                 _buildRememberMe(context),
                 SizedBox(height: 27.v),
@@ -49,7 +46,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     );
   }
 
-  Widget _buildPasswordTextField(BuildContext context, bool obscureText) {
+  Widget _buildPasswordTextField(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
       child: Column(
@@ -65,20 +62,20 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 hintText: "Please Enter Your Password",
                 textInputAction: TextInputAction.done,
                 textInputType: TextInputType.visiblePassword,
-                obscureText: obscureText, // Use the obscureText property
+                obscureText: _obscurePassword, // Use the _obscurePassword property
                 contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
               ),
               GestureDetector(
                 onTap: () {
                   // Toggle the password visibility
                   setState(() {
-                    obscureText = !obscureText;
+                    _obscurePassword = !_obscurePassword;
                   });
                 },
                 child: Container(
                   margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
                   child: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
                     color: Colors.grey,
                   ),
                 ),
@@ -98,7 +95,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
           CustomCheckbox(
             value: rememberMe,
             onChanged: (value) {
-              rememberMe = value!;
+              setState(() {
+                rememberMe = value!;
+              });
             },
           ),
           SizedBox(width: 10),

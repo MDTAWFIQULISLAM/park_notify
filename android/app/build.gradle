@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.park_notify"
+    namespace "com.example.parknotify"
     ndkVersion flutter.ndkVersion
     compileSdkVersion 34
 
@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.park_notify"
+        applicationId "com.example.parknotify"
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()

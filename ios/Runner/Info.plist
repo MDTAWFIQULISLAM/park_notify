@@ -49,6 +49,10 @@
 		<false/>
 		<key>NSLocationWhenInUseUsageDescription</key>
         <string>We need your location to provide you with relevant information based on your current location.</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>We need your location to show your position on the map.</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>We need your location to show your position on the map.</string>
 
 	</dict>
 </plist>

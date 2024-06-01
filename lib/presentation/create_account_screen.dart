@@ -7,9 +7,14 @@ import 'package:park_notify/widgets/custom_text_form_field.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 
-class CreateAccountScreen extends StatelessWidget {
+class CreateAccountScreen extends StatefulWidget {
   CreateAccountScreen({Key? key}) : super(key: key);
 
+  @override
+  _CreateAccountScreenState createState() => _CreateAccountScreenState();
+}
+
+class _CreateAccountScreenState extends State<CreateAccountScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -19,10 +24,11 @@ class CreateAccountScreen extends StatelessWidget {
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool _obscureTextPassword = true;
+  bool _obscureTextConfirmPassword = true;
+
   @override
   Widget build(BuildContext context) {
-    bool _obscureText = true;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
@@ -40,9 +46,9 @@ class CreateAccountScreen extends StatelessWidget {
               SizedBox(height: 9.v),
               _buildPhoneNumber(context),
               SizedBox(height: 15.v),
-              _buildPassword(context, _obscureText),
+              _buildPassword(context),
               SizedBox(height: 15.v), // Add space between Password and Confirm Password
-              _buildConfirmPassword(context, _obscureText),
+              _buildConfirmPassword(context),
               SizedBox(height: 19.v),
               _buildContinueButton(context),
               SizedBox(height: 22.v),
@@ -101,7 +107,9 @@ class CreateAccountScreen extends StatelessWidget {
             country: selectedCountry,
             controller: phoneNumberController,
             onTap: (Country value) {
-              selectedCountry = value;
+              setState(() {
+                selectedCountry = value;
+              });
             },
           ),
         ],
@@ -109,7 +117,7 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPassword(BuildContext context, bool obscureText) {
+  Widget _buildPassword(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
       child: Column(
@@ -125,18 +133,19 @@ class CreateAccountScreen extends StatelessWidget {
                 hintText: "Enter your password",
                 textInputAction: TextInputAction.done,
                 textInputType: TextInputType.visiblePassword,
-                obscureText: obscureText, // Use the obscureText property
+                obscureText: _obscureTextPassword, // Use the obscureText property
                 contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
               ),
               GestureDetector(
                 onTap: () {
-                  // Toggle the password visibility
-                  obscureText = !obscureText;
+                  setState(() {
+                    _obscureTextPassword = !_obscureTextPassword;
+                  });
                 },
                 child: Container(
                   margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
                   child: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    _obscureTextPassword ? Icons.visibility : Icons.visibility_off,
                     color: Colors.grey,
                   ),
                 ),
@@ -148,7 +157,7 @@ class CreateAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildConfirmPassword(BuildContext context, bool obscureText) {
+  Widget _buildConfirmPassword(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 1.h),
       child: Column(
@@ -164,18 +173,19 @@ class CreateAccountScreen extends StatelessWidget {
                 hintText: "Confirm your password",
                 textInputAction: TextInputAction.done,
                 textInputType: TextInputType.visiblePassword,
-                obscureText: obscureText, // Use the obscureText property
+                obscureText: _obscureTextConfirmPassword, // Use the obscureText property
                 contentPadding: EdgeInsets.only(left: 13.h, top: 11.v, bottom: 11.v),
               ),
               GestureDetector(
                 onTap: () {
-                  // Toggle the password visibility
-                  obscureText = !obscureText;
+                  setState(() {
+                    _obscureTextConfirmPassword = !_obscureTextConfirmPassword;
+                  });
                 },
                 child: Container(
                   margin: EdgeInsets.fromLTRB(0, 12.v, 17.h, 11.v),
                   child: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    _obscureTextConfirmPassword ? Icons.visibility : Icons.visibility_off,
                     color: Colors.grey,
                   ),
                 ),
@@ -186,7 +196,6 @@ class CreateAccountScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildContinueButton(BuildContext context) {
     return Column(

@@ -5,14 +5,16 @@ import 'package:park_notify/widgets/custom_elevated_button.dart';
 import 'package:park_notify/widgets/custom_outlined_button.dart';
 import 'package:park_notify/widgets/custom_text_form_field.dart';
 
-class RegisterYourVehicleScreen extends StatelessWidget {
+class RegisterYourVehicleScreen extends StatefulWidget {
   RegisterYourVehicleScreen({Key? key}) : super(key: key);
 
-  TextEditingController registrationNumberPlaceholderController =
-  TextEditingController();
+  @override
+  _RegisterYourVehicleScreenState createState() => _RegisterYourVehicleScreenState();
+}
 
+class _RegisterYourVehicleScreenState extends State<RegisterYourVehicleScreen> {
+  TextEditingController registrationNumberPlaceholderController = TextEditingController();
   bool rememberForFutureUse = false;
-
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -71,7 +73,9 @@ class RegisterYourVehicleScreen extends StatelessWidget {
           CustomCheckbox(
             value: rememberForFutureUse,
             onChanged: (value) {
-              rememberForFutureUse = value!;
+              setState(() {
+                rememberForFutureUse = value!;
+              });
             },
           ),
           SizedBox(width: 10),

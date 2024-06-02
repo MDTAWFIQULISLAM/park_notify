@@ -119,6 +119,8 @@ class _MapPageState extends State<MapPage> {
           lastPosition = position;
           _filterNearbyParkingLocations();
         });
+
+        _checkProximityToMarkers(position);
       } else {
         Future.delayed(Duration(seconds: 10), () {
           if (lastPosition != null &&
@@ -133,6 +135,22 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  void _checkProximityToMarkers(Position position) {
+    for (LatLng markerLocation in nearbyParkingLocations) {
+      double distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        markerLocation.latitude,
+        markerLocation.longitude,
+      );
+
+      if (distance <= 50.0) { // 50 meters proximity
+        _showAreYouParkedDialog();
+        break;
+      }
+    }
+  }
+
   void _showAreYouParkedDialog() {
     showDialog(
       context: context,
@@ -144,13 +162,13 @@ class _MapPageState extends State<MapPage> {
               child: Text("Yes"),
               onPressed: () {
                 Navigator.of(context).pop();
-                // Handle 'Yes' action
+                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
               },
             ),
             TextButton(
               child: Text("No"),
               onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.confirmedParkedStatus);
+                Navigator.of(context).pop();
               },
             ),
           ],

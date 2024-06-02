@@ -103,7 +103,6 @@ class _MapPageState extends State<MapPage> {
             'Error getting current location. Please check your location settings.',
           ),
         ),
-
       );
     }
   }
@@ -120,7 +119,6 @@ class _MapPageState extends State<MapPage> {
           lastPosition = position;
           _filterNearbyParkingLocations();
         });
-
       } else {
         Future.delayed(Duration(seconds: 10), () {
           if (lastPosition != null &&
@@ -129,7 +127,6 @@ class _MapPageState extends State<MapPage> {
             _showAreYouParkedDialog();
           }
         });
-
       }
     } catch (e) {
       print("Error checking location change: $e");
